@@ -4,8 +4,6 @@ const crypto = require('crypto')
 
 exports.login = (req, res, next) => {
 
-    console.log({"received smthing " : req.body});
-
     // Récupération des informations du compte dans la base de données des comptes définitifs
     funcs.bddQuery(req.conPortail, 'SELECT password FROM auth_user WHERE username = ?', [req.body.login])
     // funcs.bddQuery(req.conPortail, 'SELECT * FROM auth_user')
@@ -22,7 +20,6 @@ exports.login = (req, res, next) => {
             const pwdToHash = Buffer.from(req.body.password, 'utf-8').toString();
 
             crypto.pbkdf2(pwdToHash,salt, iterations, 32, algorithm, (err, derivedKey) => {
-                console.log({"err" : err});
                 if (err == null && derivedKey.toString("hex") == truePwddecoded) { // Mot de passe correct
                     return funcs.sendSuccess(res, {
                         token : jwt.sign(
