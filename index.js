@@ -1,21 +1,14 @@
-// Exemple adapté de la mise en route d'Express : 
-// http://expressjs.com/fr/starter/hello-world.html
 var express = require('express');
-const bodyParser = require('body-parser');
-var app = express();
-
 const mysql = require('mysql');
 
-// '/' est la route racine
-app.get('/', function (req, res) {
-  res.send('Bonjour !');
-});
+// Routes imports
+const userRoutes = require('./routes/userRoutes');
 
-app.listen(4000, function () {
-  console.log("Application d'exemple écoutant sur le port 4000 !");
-});
 
-con = mysql.createConnection({
+// BDD connection
+
+  // BDA One
+conBDA = mysql.createConnection({
   host: "mysql-bda-mines.alwaysdata.net",
   user: "bda-mines",
   password: "minesdavis",
@@ -23,7 +16,44 @@ con = mysql.createConnection({
 });
 
 // open the MySQL connection
-con.connect(error => {
+conBDA.connect(error => {
   if (error) throw error;
-  console.log("Successfully connected to the database.");
+  console.log("Successfully connected to the BDA's database."); 
 });
+
+  // Portail one
+
+conPortail = mysql.createConnection({
+  host: "Ns37866.ip-91-121-8.eu",
+  user: "bda",
+  password: "m0ANsNwopInXDunZ",
+  database: "portail"
+});
+
+// open the MySQL connection
+conPortail.connect(error => {
+  if (error) throw error;
+  console.log("Successfully connected to the Portail's database."); 
+});
+
+const app = express();
+
+app.listen(4000, function () {
+  console.log("Application d'exemple écoutant sur le port 4000 !");
+});
+
+app.use(express.json());
+app.use(function(req, res,next){
+  req.conBDA = conBDA;
+  req.conPortail = conPortail;
+  next();
+});
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  next();
+});
+
+app.use('/api/user', userRoutes);
