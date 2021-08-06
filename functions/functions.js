@@ -36,26 +36,6 @@ var sendSuccess = function(res, object) {
     }
 }
 
-var isInRadius = function(con, login) {
-    // Fonction pour tester la présence d'un compte, repéré par son login, dans la base de données radius
-    var itIs = false;
-    return new Promise(function(resolve, reject) {
-        bddQuery(con, "SELECT COUNT(*) FROM radius WHERE login = ?", [login]) 
-        .then((num) => {
-            if (num[0]['COUNT(*)'] == 1) { // Trouvé
-                itIs = true;
-                return resolve(itIs);
-            } else {
-                itIs = false;
-                return resolve(itIs);
-            }
-        })
-        .catch((error) => {
-            return reject(error);
-        });
-    });
-}
-
 var whereIsAccount = function(con, login) {
 
     // On cherche avec cette fonction à déterminer si un certain login est dans la base des comptes approuvés, en attente, ou si le login n'est pas présent
@@ -93,4 +73,4 @@ var currentDate = function() {
     return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
 }
 
-module.exports = {bddQuery : bddQuery, hashPassword : hashPassword, sendError: sendError, sendSuccess : sendSuccess, whereIsAccount : whereIsAccount, isInRadius : isInRadius, currentDate : currentDate};
+module.exports = {bddQuery : bddQuery, hashPassword : hashPassword, sendError: sendError, sendSuccess : sendSuccess, whereIsAccount : whereIsAccount, currentDate : currentDate};
