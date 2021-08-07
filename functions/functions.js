@@ -16,8 +16,8 @@ var bddQuery = function(con, query, args) {
     });
 };
 
-var hashPassword = function(passwordToCrypt) {
-    return SHA2["SHA-256"](passwordToCrypt).toString("hex");
+var hash = function(word) {
+    return SHA2["SHA-256"](word).toString("hex");
 }
 
 var sendError = function(res, message, error = "") {
@@ -73,4 +73,4 @@ var currentDate = function() {
     return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
 }
 
-module.exports = {bddQuery : bddQuery, hashPassword : hashPassword, sendError: sendError, sendSuccess : sendSuccess, whereIsAccount : whereIsAccount, currentDate : currentDate};
+module.exports = {bddQuery : bddQuery, hash : hash, sendError: sendError, sendSuccess : sendSuccess, whereIsAccount : whereIsAccount, currentDate : currentDate};
