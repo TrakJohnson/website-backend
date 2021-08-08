@@ -39,7 +39,7 @@ exports.createAccount = (req, res, next) => {
     console.log({"coucou0" : req.body});
 
     const body = req.body;
-    if (body.loginAccountCreated == undefined, body.prenom == undefined, body.nom == undefined, body.email == undefined, body.password == undefined, body.admin == undefined, body.contributor == undefined) {
+    if (body.loginAccountCreated && body.prenom && body.nom && body.email && body.password && body.admin && body.contributor) {
         return funcs.sendError(res, "Il manque des informations pour créer le compte !");
     }
 
