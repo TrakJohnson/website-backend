@@ -8,10 +8,19 @@ exports.getEventsTocome = (req, res, next) => {
     .then((data) => {
 
         if (data == undefined || data.length < 1) {
-            funcs.sendSuccess(res, {message : "Evenement modifié !"})
+            funcs.sendSuccess(res, [])
+        } else {
+            var eventsToSendToFrond = [];
+            data.forEach(eventData => {
+                eventsToSendToFrond.push(new Event(eventData));
+            });
+            funcs.sendSuccess(res, eventsToSendToFrond);
         }
 
+
     })
+    .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-0 & 405)", error))
+
 }
 
 exports.createBilletterie = (req, res, next) => {
@@ -24,6 +33,8 @@ exports.createBilletterie = (req, res, next) => {
 }
 
 exports.modifyBilletterie = (req, res, next) => {
+
+    // D'abord on vérifie qu'on a les infos dont on a besoin
     const body = req.body;
     if (body.id_event == undefined) {
         return funcs.sendError(res, "Pas d'ID de billeterie fourni");
@@ -45,11 +56,20 @@ exports.modifyBilletterie = (req, res, next) => {
 }
 
 exports.deleteBilletterie = (req, res, next) => {
+    // D'abord on vérifie qu'on a les infos dont on a besoin
     const body = req.body;
     if (body.id_event == undefined) {
         return funcs.sendError(res, "Pas d'ID de billeterie fourni");
     }
-    func.bddQuery(req.conBDA, "DELETE FROM newBilleterie WHERE id_event = ?", [body.id_event])
-    .then(() => funcs.sendSuccess(res, {message : "Evenement supprimé !"}))
+    
+    // Ensuite on supprime les places relatives à cet évènement
+    func.bddQuery(req.conBDA, "DELETE FROM newPlaces WHERE id_event = ?", [body.id_event])
+    .then(() => {
+        // Enfin on supprime l'évènement en lui même
+        func.bddQuery(req.conBDA, "DELETE FROM newBilleterie WHERE id_event = ?", [body.id_event])
+        .then(() => funcs.sendSuccess(res, {message : "Evenement supprimé !"}))
+        .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-4 & 405)", error))
+    })
     .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-4 & 405)", error))
+   
 }

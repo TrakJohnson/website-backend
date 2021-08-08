@@ -35,6 +35,10 @@ exports.login = (req, res, next) => {
     .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);});
 };
 
+exports.getDemandedPlacesStatus = (req, res, next) => {
+    
+}
+
 exports.createAccount = (req, res, next) => {
     console.log({"coucou0" : req.body});
 
