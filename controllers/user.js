@@ -1,6 +1,28 @@
 const funcs = require('../functions/functions');
 const jwt = require('jsonwebtoken');
 const { currentDate } = require('../functions/functions');
+const Account = require('../models/account');
+
+getDemandedPlacesStatus = (conBda, login) => {
+
+    return new Promise(function(resolve, reject) {
+
+        funcs.bddQuery(conBDA, "SELECT * FROM newPlaces WHERE login = ?", [login])
+        .then((data) => {
+            if (data == undefined || data.length < 1) {
+                resolve([]);
+            } else {
+                var placesToSendFront = [];
+                data.forEach(place => {
+                    placesToSendFront.push(place);
+                });
+                resolve(placesToSendFront);
+            }
+        })
+        .catch((error) => reject(error));
+    });
+
+}
 
 exports.login = (req, res, next) => {
 
@@ -16,17 +38,31 @@ exports.login = (req, res, next) => {
 
                 // Update last connection date of this user
                 funcs.bddQuery(req.conBDA, 'UPDATE newUsers SET date_last_con = ? WHERE login = ?', [currentDate(), req.body.login])
-
-                return funcs.sendSuccess(res, {
-                    token : jwt.sign(
-                        {login : req.body.login},
-                        'RANDOM_TOKEN_SECRET',
-                        { expiresIn: '24h'}
-                    )
-                });  
+                .then(() => {
+                    funcs.bddQuery(req.conBDA, 'SELECT * FROM newUsers WHERE login = ?', [req.body.login])
+                    .then((data) => {
+                        if (data == undefined || data.length == 0) {
+                            return funcs.sendError(res, "Login non reconnu", error);
+                        }
+                        getDemandedPlacesStatus(req.conBda, req.body.login)
+                        .then((dataPlaces) => {
+                            data[0].placesDemanded = dataPlaces;
+                            const compteUser = new Account(data[0]);
+                            return funcs.sendSuccess(res, {
+                                token : jwt.sign(
+                                    {login : req.body.login},
+                                    'RANDOM_TOKEN_SECRET',
+                                    { expiresIn: '24h'}
+                                ),
+                                compte : compteUser
+                            });  
+                        });
+                    })
+                    .catch((error) => {return funcs.sendError(res, "Login non reconnu", error);});
+                })
+                .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);});
             } else {
                 return funcs.sendError(res, "Mot de passe incorrect !");
-
             }
         } else { // Login not found :/
             return funcs.sendError(res, "Ce login n'existe pas !");
@@ -34,10 +70,6 @@ exports.login = (req, res, next) => {
     }) 
     .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);});
 };
-
-exports.getDemandedPlacesStatus = (req, res, next) => {
-    
-}
 
 exports.createAccount = (req, res, next) => {
     console.log({"coucou0" : req.body});

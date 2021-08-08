@@ -9,6 +9,6 @@ router.post('/getEventsTocome', eventCtrl.getEventsTocome);
 router.post('/createBilletterie', eventCtrl.createBilletterie);
 router.post('/modifyBilletterie', eventCtrl.modifyBilletterie);
 router.post('/deleteBilletterie', eventCtrl.deleteBilletterie);
-
+router.get('/getAllEvents', eventCtrl.getAllEvents);
 
 module.exports = router;

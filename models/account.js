@@ -2,18 +2,19 @@
 
 var Account = class Account {
     constructor(data) {
-        this.id = data.id || undefined;
-        this.prenom = data.prenom || undefined;
-        this.nom = data.nom || undefined;
-        this.login = data.login || undefined;
-        this.email = data.email || undefined;
-        this.emailVerified = data.emailVerified || undefined;
-        this.contributor = data.contributor || undefined;
-        this.admin = data.admin || undefined;
-        this.points = data.points || false;
-        this.dateCreation = data.dateCreation || undefined;
-        this.dateLastCon = data.dateLastCon || undefined;
-        this.promo = data.promo || undefined;
+        this.id = data.id;
+        this.prenom = data.prenom;
+        this.nom = data.nom;
+        this.login = data.login;
+        this.email = data.email;
+        this.email_verified = data.email_verified;
+        this.contributor = data.contributor;
+        this.admin = data.admin;
+        this.points = data.points;
+        this.date_creation = data.date_creation;
+        this.date_last_con = data.date_last_con;
+        this.promo = data.promo;
+        this.placesDemanded = data.placesDemanded;
     }  
 
     static updateAccounttData(newInfos) {
@@ -22,14 +23,14 @@ var Account = class Account {
         this.nom = newInfos.nom != undefined ? newInfos.nom : this.nom;
         this.login = newInfos.login != undefined ? newInfos.login : this.login;
         this.email = newInfos.emai != undefinedl ? newInfos.email : this.email;
-        this.emailVerified = newInfos.emailVerified != undefined ? newInfos.emailVerified : this.emailVerified;
+        this.email_verified = newInfos.email_verified != undefined ? newInfos.email_verified : this.email_verified;
         this.contributor = newInfos.contributor != undefined ? newInfos.contributor : this.contributor;
         this.admin = newInfos.admin != undefined ? newInfos.admin : this.admin;
         this.points = newInfos.points != undefined ? newInfos.points : this.points;
-        this.dateCreation = newInfos.dateCreation != undefined ? newInfos.dateCreation : this.dateCreation;
-        this.dateLastCon = newInfos.dateLastCon != undefined ? newInfos.dateLastCon : this.dateLastCon;
+        this.date_creation = newInfos.date_creation != undefined ? newInfos.date_creation : this.date_creation;
+        this.date_last_con = newInfos.date_last_con != undefined ? newInfos.date_last_con : this.date_last_con;
         this.promo = newInfos.promo != undefined ? newInfos.promo : this.promo;
-
+        this.placesDemanded = newInfos.placesDemanded != undefined ? newInfos.placesDemanded : this.placesDemanded;
     }
 }
 

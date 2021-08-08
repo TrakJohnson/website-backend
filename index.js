@@ -69,4 +69,4 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/user', userRoutes);
-app.use('/api/user', eventRoutes);
+app.use('/api/event', eventRoutes);
