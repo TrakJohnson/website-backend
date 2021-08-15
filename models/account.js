@@ -2,7 +2,6 @@
 
 var Account = class Account {
     constructor(data) {
-        this.id = data.id;
         this.prenom = data.prenom;
         this.nom = data.nom;
         this.login = data.login;
@@ -17,8 +16,7 @@ var Account = class Account {
         this.placesDemanded = data.placesDemanded;
     }  
 
-    static updateAccounttData(newInfos) {
-        this.id = newInfos.id != undefined ? newInfos.id : this.id;
+    static updateAccountData(newInfos) {
         this.prenom = newInfos.prenom != undefined ? newInfos.prenom : this.prenom;
         this.nom = newInfos.nom != undefined ? newInfos.nom : this.nom;
         this.login = newInfos.login != undefined ? newInfos.login : this.login;

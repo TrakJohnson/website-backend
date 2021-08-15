@@ -6,6 +6,9 @@ var smtpTransport = require('nodemailer-smtp-transport');
 // Routes imports
 const userRoutes = require('./routes/userRoutes');
 const eventRoutes = require('./routes/eventRoutes');
+const teamRoutes = require('./routes/teamRoutes');
+const poleRoutes = require('./routes/poleRoutes');
+
 
 // BDD connection
 
@@ -70,3 +73,5 @@ app.use((req, res, next) => {
 
 app.use('/api/user', userRoutes);
 app.use('/api/event', eventRoutes);
+app.use('/api/team', teamRoutes);
+app.use('/api/pole', poleRoutes);
