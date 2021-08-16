@@ -6,6 +6,7 @@ var Event = class Event {
         this.title = data.title;
         this.description = data.description;
         this.dateEvent = data.dateEvent;
+        this.thumbnail = data.thumbnail;
         this.event_place = data.event_place;
         this.pole_id = data.pole_id;
         this.login_creator = data.loginSender;
@@ -24,6 +25,7 @@ var Event = class Event {
         this.description = newInfos.description != undefined ? newInfos.description : this.description;
         this.dateEvent = newInfos.dateEvent != undefined ? newInfos.dateEvent : this.dateEvent;
         this.event_place = newInfos.event_place != undefined ? newInfos.event_place : this.event_place;
+        this.thumbnail = newInfos.thumbnail != undefined ? newInfos.thumbnail : this.thumbnail;
         this.pole_id = newInfos.pole_id != undefined ? newInfos.pole_id : this.pole_id;
         this.login_creator = newInfos.login_creator != undefined ? newInfos.login_creator : this.login_creator;
         this.date_open = newInfos.date_open != undefined ? newInfos.date_open : this.id_evedate_opennt;
