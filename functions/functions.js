@@ -16,8 +16,8 @@ var bddQuery = function(con, query, args) {
     });
 };
 
-var hashPassword = function(passwordToCrypt) {
-    return SHA2["SHA-256"](passwordToCrypt).toString("hex");
+var hash = function(word) {
+    return SHA2["SHA-256"](word).toString("hex");
 }
 
 var sendError = function(res, message, error = "") {
@@ -34,26 +34,6 @@ var sendSuccess = function(res, object) {
         // console.log({objectOfSuccess: object});
         return res.status(200).send(object);
     }
-}
-
-var isInRadius = function(con, login) {
-    // Fonction pour tester la présence d'un compte, repéré par son login, dans la base de données radius
-    var itIs = false;
-    return new Promise(function(resolve, reject) {
-        bddQuery(con, "SELECT COUNT(*) FROM radius WHERE login = ?", [login]) 
-        .then((num) => {
-            if (num[0]['COUNT(*)'] == 1) { // Trouvé
-                itIs = true;
-                return resolve(itIs);
-            } else {
-                itIs = false;
-                return resolve(itIs);
-            }
-        })
-        .catch((error) => {
-            return reject(error);
-        });
-    });
 }
 
 var whereIsAccount = function(con, login) {
@@ -93,4 +73,4 @@ var currentDate = function() {
     return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
 }
 
-module.exports = {bddQuery : bddQuery, hashPassword : hashPassword, sendError: sendError, sendSuccess : sendSuccess, whereIsAccount : whereIsAccount, isInRadius : isInRadius, currentDate : currentDate};
+module.exports = {bddQuery : bddQuery, hash : hash, sendError: sendError, sendSuccess : sendSuccess, whereIsAccount : whereIsAccount, currentDate : currentDate};
