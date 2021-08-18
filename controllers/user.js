@@ -52,7 +52,7 @@ exports.login = (req, res, next) => {
                                 token : jwt.sign(
                                     {login : req.body.login},
                                     'RANDOM_TOKEN_SECRET',
-                                    { expiresIn: '24h'}
+                                    { expiresIn: '2h'}
                                 ),
                                 compte : compteUser
                             });  
@@ -70,6 +70,44 @@ exports.login = (req, res, next) => {
     }) 
     .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);});
 };
+
+exports.loginFromToken = (req, res, next) => {
+
+
+    const token = req.body.token
+    var decodedToken = new String;
+    try {
+        decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET')
+    } catch(err) {
+        return funcs.sendError(res, "Token error", err);
+    }
+
+
+    const login = decodedToken.login;
+        
+    funcs.bddQuery(req.conBDA, 'UPDATE newUsers SET date_last_con = ? WHERE login = ?', [currentDate(), req.body.login])
+    .then(() => {
+        funcs.bddQuery(req.conBDA, 'SELECT * FROM newUsers WHERE login = ?', [login])
+        .then((data) => {
+            if (data == undefined || data.length == 0) {
+                return funcs.sendError(res, "Login non reconnu", error);
+            }
+            getDemandedPlacesStatus(req.conBda, req.body.login)
+            .then((dataPlaces) => {
+                data[0].placesDemanded = dataPlaces;
+                const compteUser = new Account(data[0]);
+                return funcs.sendSuccess(res, {
+                    token : token,
+                    compte : compteUser
+                });  
+            });
+        })
+        .catch((error) => {return funcs.sendError(res, "Login non reconnu", error);});
+    })
+    .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);});
+}
+     
+        
 
 exports.createAccount = (req, res, next) => {
     console.log({"coucou0" : req.body});

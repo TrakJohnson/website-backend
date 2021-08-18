@@ -14,6 +14,7 @@ var Account = class Account {
         this.date_last_con = data.date_last_con;
         this.promo = data.promo;
         this.placesDemanded = data.placesDemanded;
+        this.last_token = data.last_token
     }  
 
     static updateAccountData(newInfos) {
@@ -29,6 +30,7 @@ var Account = class Account {
         this.date_last_con = newInfos.date_last_con != undefined ? newInfos.date_last_con : this.date_last_con;
         this.promo = newInfos.promo != undefined ? newInfos.promo : this.promo;
         this.placesDemanded = newInfos.placesDemanded != undefined ? newInfos.placesDemanded : this.placesDemanded;
+        this.last_token = newInfos.last_token != undefined ? newInfos.last_token : this.last_token;
     }
 }
 
