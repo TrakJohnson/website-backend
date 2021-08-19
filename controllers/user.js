@@ -157,7 +157,7 @@ exports.SendVerificationEmail  = (req, res, next) => {
         from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
         to: req.body.email, // list of receivers
         subject: "[BDA] Verification adresse mail", // Subject line
-        html : "<p> Bonjour, </p> <p> tu as créé un compte avec cet email sur le site du Rezal, si cela n'est pas le cas, contacte les administrateurs. <br> Pour vérifier cet email, clique sur ce lien : <br> 'http://localhost:4200/register/verify-email/" + req.body.hash + " </p>"
+        html : "<p> Bonjour, </p> <p> tu as créé un compte avec cet email sur le site du BDA des Mines Paristech, si cela n'est pas le cas, contacte les administrateurs ou répond à cet email. <br> Pour vérifier cet email, clique sur ce lien : <br> 'http://localhost:4200/register/verify-email/" + req.body.hash + " </p>"
     }
 
     // Email with connection IDs (login & password)
@@ -197,9 +197,9 @@ exports.VerifyEmail = (req, res, next) => {
 
     // On récupère le login
     console.log(req.body)
-    funcs.bddQuery(req.conBDA, 'SELECT login FROM VerificationEmail WHERE code = ?', [req.body.token])
+    funcs.bddQuery(req.conBDA, 'SELECT login FROM VerificationEmail WHERE code = ?', [req.body.code])
     .then((data) => {
-        console.log("coucou9");
+        console.log("coucou9  " + data);
 
         if (data != undefined && data.length > 0) {
             loginToVerifyEmail = data[0].login;
