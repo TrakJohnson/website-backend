@@ -72,6 +72,7 @@ exports.login = (req, res, next) => {
 };
 
 exports.loginFromToken = (req, res, next) => {
+
         
     funcs.bddQuery(req.conBDA, 'UPDATE newUsers SET date_last_con = ? WHERE login = ?', [currentDate(), req.body.login])
     .then(() => {
@@ -85,7 +86,11 @@ exports.loginFromToken = (req, res, next) => {
                 data[0].placesDemanded = dataPlaces;
                 const compteUser = new Account(data[0]);
                 return funcs.sendSuccess(res, {
-                    token : token,
+                    token : jwt.sign(
+                        {login : req.body.login},
+                        'RANDOM_TOKEN_SECRET',
+                        { expiresIn: '2h'}
+                    ),
                     compte : compteUser
                 });  
             });
@@ -101,7 +106,7 @@ exports.createAccount = (req, res, next) => {
     console.log({"coucou0" : req.body});
 
     const body = req.body;
-    if (body.loginAccountCreated && body.prenom && body.nom && body.email && body.password && body.admin && body.contributor) {
+    if (body.loginAccountCreated && body.prenom && body.nom && body.email && body.password && body.admin && body.promotion) {
         return funcs.sendError(res, "Il manque des informations pour créer le compte !");
     }
     //we have to chekc if nobody has the same login yet
@@ -121,7 +126,7 @@ exports.createAccount = (req, res, next) => {
         const creationDate = currentDate();
         const lastConDate = currentDate();
         console.log(body.password)
-        funcs.bddQuery(req.conBDA, 'INSERT INTO newUsers (login, prenom, nom, email, email_verified, password, admin, contributor, date_creation, date_last_con, promo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); ', [req.body.loginAccountCreated, body.prenom, body.nom, body.email, false /*email verified : no*/, body.password, body.admin, body.contributor, creationDate, lastConDate, body.promotion])
+        funcs.bddQuery(req.conBDA, 'INSERT INTO newUsers (login, prenom, nom, email, email_verified, password, admin, contributor, date_creation, date_last_con, promo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); ', [req.body.loginAccountCreated, body.prenom, body.nom, body.email, false /*email verified : no*/, body.password, body.admin, 0 /* not contributor by default*/ , creationDate, lastConDate, body.promotion])
         .then(() => {console.log("coucou2"); next()})
         .catch((error) => {console.log(error); return funcs.sendError(res, "Erreur lors de la création du compte");})
         
