@@ -22,6 +22,7 @@ exports.findLoginInToken = (req, res, next) => {
         decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET')
         const login = decodedToken.login;
         if (login != undefined) {
+            console.log("found   " + login)
             req.body.login = login;
             next();
         }

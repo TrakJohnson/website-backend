@@ -47,8 +47,15 @@ exports.sendRecoverMail = (req, res, next) => {
 
 
 exports.changePassword = (req, res, next) => {
+    console.log(req.body.login)
 
+    funcs.bddQuery(req.conBDA, "UPDATE newUsers SET password = ? WHERE login = ?", [req.body.newPassword, req.body.login])
+    .then(()=>{
+        funcs.sendSuccess(res, {message : "Mot de passe changé avec succès"})
+    })
+    .catch((error) => {
+        funcs.sendError(res, "Erreur de changement de mot de passe", error)
+    })
     
-    
-}
+};
 
