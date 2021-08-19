@@ -41,10 +41,11 @@ exports.getAllEvents = (req, res, next) => {
 
 exports.createBilletterie = (req, res, next) => {
     const body = req.body;
+    console.log(body)
 
     if (body.title && body.description && body.dateEvent && body.event_place && body.thumbnail && body.pole_id && body.loginSender && body.date_open && body.date_close && body.num_places && body.cost_contributor && body.cost_non_contributor && body.points) {
         
-        funcs.bddQuery(req.conBDA, "INSERT INTO newBilletterie ('title', 'description', 'dateEvent', 'event_place', 'pole_id', 'login_creator', 'date_open', 'date_close', 'num_places', 'cost_contributor', 'const_non_contributor', 'points', 'on_sale', 'thumbnail') VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [body.title , body.description , body.dateEvent , body.event_place , body.pole_id , body.loginSender , body.date_open , body.date_close , body.num_places , body.cost_contributor,  body.const_non_contributor, body.points, 0 /* Billetterie fermée lors de sa création*/, body.thumbnail])
+        funcs.bddQuery(req.conBDA, "INSERT INTO newBilletterie ('title', 'description', 'dateEvent', 'event_place', 'pole_id', 'login_creator', 'date_open', 'date_close', 'num_places', 'cost_contributor', 'const_non_contributor', 'points', 'on_sale', 'thumbnail') VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [body.title , body.description , body.dateEvent , body.event_place , body.pole_id , body.loginSender , body.date_open , body.date_close , body.num_places , body.cost_contributor,  body.cost_non_contributor, body.points, 0 /* Billetterie fermée lors de sa création*/, body.thumbnail])
         .then(() => funcs.sendSuccess(res, {message : "Evenement créé !"}))
         .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-1 & 405)", error))
     }

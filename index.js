@@ -3,11 +3,14 @@ const mysql = require('mysql');
 const nodemailer = require('nodemailer');
 var smtpTransport = require('nodemailer-smtp-transport');
 
+const {google} = require('googleapis');
+
 // Routes imports
 const userRoutes = require('./routes/userRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const teamRoutes = require('./routes/teamRoutes');
 const poleRoutes = require('./routes/poleRoutes');
+const recoverRoutes = require('./routes/recoverRoutes')
 
 
 // BDD connection
@@ -41,14 +44,20 @@ conPortail.connect(error => {
   console.log("Successfully connected to the Portail's database."); 
 });
 
-let transporter = nodemailer.createTransport(smtpTransport({
-  service: 'gmail',
-  host: 'smtp.gmail.com',
-  auth: {
-      user: 'antoine.sherwood98@gmail.com',
-      pass: 'Antoine99'
-  }
-}));
+// let transporter = nodemailer.createTransport(smtpTransport({
+//   service: 'gmail',
+//   host: 'smtp.gmail.com',
+//   auth: {
+//       user: 'bda.rsi.minesparis@gmail.com',
+//       pass: 'del5D8IKL0zU'
+//   }
+// }));
+
+
+
+
+
+
 
 const app = express();
 
@@ -56,11 +65,11 @@ app.listen(4000, function () {
   console.log("Application d'exemple écoutant sur le port 4000 !");
 });
 
-app.use(express.json());
+app.use(express.json({limit: '8mb'}));
 app.use(function(req, res,next){
   req.conBDA = conBDA;
   req.conPortail = conPortail;
-  req.transporter = transporter;
+  // req.transporter = transporter;
   next();
 });
 
@@ -75,3 +84,4 @@ app.use('/api/user', userRoutes);
 app.use('/api/event', eventRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/pole', poleRoutes);
+app.use('/api/recover', recoverRoutes);

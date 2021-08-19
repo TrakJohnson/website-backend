@@ -151,7 +151,7 @@ exports.SendVerificationEmail  = (req, res, next) => {
     console.log("coucou5");
 
     email1Options = {
-        from: '"RSI BDA" <antoine.servolin@gmail.com>', // sender address
+        from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
         to: req.body.email, // list of receivers
         subject: "[BDA] Verification adresse mail", // Subject line
         html : "<p> Bonjour, </p> <p> tu as créé un compte avec cet email sur le site du Rezal, si cela n'est pas le cas, contacte les administrateurs. <br> Pour vérifier cet email, clique sur ce lien : <br> 'http://localhost:4200/register/verify-email/" + req.body.token + " </p>"
@@ -160,29 +160,30 @@ exports.SendVerificationEmail  = (req, res, next) => {
     // Email with connection IDs (login & password)
 
     email2Options = {
-        from: '"RSI BDA" <antoine.servolin@gmail.com>', // sender address
+        from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
         to: req.body.email, // list of receivers
         subject: "[BDA] Verification adresse mail", // Subject line
         html : "<p> Bonjour, </p> <p> Tes informations de connexion sont : </p> <br> login : " + req.body.loginAccountCreated + "<br> Mot de passe : celui entré lors de la création de ton compte"
     }
 
-    req.transporter.sendMail(email1Options, function(error, info) {
-        console.log("coucou6");
-        if (error) {
+    funcs.sendMail(email1Options)
+    .then(() => {
+        console.log("Email 1 sent");
+        funcs.sendMail(email2Options)
+        .then (() => {
+            console.log("Email 2 sent");
+            return funcs.sendSuccess(res, {message : "Utilisateur créé !", loginAssigned : req.body.loginAccountCreated});
+        })
+        .catch((err) => {
+            console.log(err)
             return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-1 & 405)", error);
-        } else {
-            req.transporter.sendMail(email2Options, function(error, info) {
-                console.log("coucou7");
-                if (error) {
-                    return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-2 & 405)", error);
-                } else {
-                    console.log("coucou8");
-                    return funcs.sendSuccess(res, {message : "Utilisateur créé !", loginAssigned : req.body.loginAccountCreated});
-                }
-            });
-        }
-    });
+        })
+    })
+    .catch((err) => { 
+        return funcs.sendSuccess(res, {message : "Utilisateur créé !", loginAssigned : req.body.loginAccountCreated});
+    })
 };
+
 
 exports.VerifyEmail = (req, res, next) => {
 
