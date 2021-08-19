@@ -1,6 +1,6 @@
 const funcs = require('../functions/functions');
 const jwt = require('jsonwebtoken');
-const { currentDate } = require('../functions/functions');
+const { currentDate, sendError } = require('../functions/functions');
 const Account = require('../models/account');
 
 getDemandedPlacesStatus = (conBda, login) => {
@@ -104,20 +104,35 @@ exports.createAccount = (req, res, next) => {
     if (body.loginAccountCreated && body.prenom && body.nom && body.email && body.password && body.admin && body.contributor) {
         return funcs.sendError(res, "Il manque des informations pour créer le compte !");
     }
+    //we have to chekc if nobody has the same login yet
+    funcs.bddQuery(req.conBDA, "SELECT COUNT(*) FROM newUsers WHERE login LIKE ?", req.body.loginAccountCreated + '%') //retourne le nombre de compte ayant eu le meme login assigné par défaut
+    .then((data) => {
+        console.log("result :  " + data[0]['COUNT(*)'])
 
-    console.log("coucou1");
+        var index = data[0]['COUNT(*)'];
 
-    // We have all info we need to create account
-    const creationDate = currentDate();
-    const lastConDate = currentDate();
+        if (index != 0) {
+            console.log("homonyme")
+            req.body.loginAccountCreated = req.body.loginAccountCreated + String(index + 1);
+        }
 
-    funcs.bddQuery(req.conBDA, 'INSERT INTO newUsers (login, prenom, nom, email, email_verified, password, admin, contributor, date_creation, date_last_con, promo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); ', [body.loginAccountCreated, body.prenom, body.nom, body.email, false /*email verified : no*/, body.password, body.admin, body.contributor, creationDate, lastConDate, body.promotion])
-    .then(() => {console.log("coucou2"); next()})
+        console.log(req.body.loginAccountCreated)
+        // We have all info we need to create account
+        const creationDate = currentDate();
+        const lastConDate = currentDate();
+        console.log(body.password)
+        funcs.bddQuery(req.conBDA, 'INSERT INTO newUsers (login, prenom, nom, email, email_verified, password, admin, contributor, date_creation, date_last_con, promo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); ', [req.body.loginAccountCreated, body.prenom, body.nom, body.email, false /*email verified : no*/, body.password, body.admin, body.contributor, creationDate, lastConDate, body.promotion])
+        .then(() => {console.log("coucou2"); next()})
+        .catch((error) => {console.log(error); return funcs.sendError(res, "Erreur lors de la création du compte");})
+        
+    })
     .catch((error) => {console.log(error); return funcs.sendError(res, "Erreur lors de la création du compte");})
+
 }
+   
 
 exports.createDemandVerification = (req, res, next) => {
-    let num = Math.floor(Math.random() * (1_000_000_000));
+    let num = Math.floor(Math.random() * (1_000_000_000))
     let hash = funcs.hash(num.toString());
     let DateCreation = funcs.currentDate();
     console.log({"coucou3" : hash, num : num});
@@ -142,7 +157,7 @@ exports.SendVerificationEmail  = (req, res, next) => {
         from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
         to: req.body.email, // list of receivers
         subject: "[BDA] Verification adresse mail", // Subject line
-        html : "<p> Bonjour, </p> <p> tu as créé un compte avec cet email sur le site du Rezal, si cela n'est pas le cas, contacte les administrateurs. <br> Pour vérifier cet email, clique sur ce lien : <br> 'http://localhost:4200/register/verify-email/" + req.body.token + " </p>"
+        html : "<p> Bonjour, </p> <p> tu as créé un compte avec cet email sur le site du Rezal, si cela n'est pas le cas, contacte les administrateurs. <br> Pour vérifier cet email, clique sur ce lien : <br> 'http://localhost:4200/register/verify-email/" + req.body.hash + " </p>"
     }
 
     // Email with connection IDs (login & password)
@@ -153,6 +168,9 @@ exports.SendVerificationEmail  = (req, res, next) => {
         subject: "[BDA] Verification adresse mail", // Subject line
         html : "<p> Bonjour, </p> <p> Tes informations de connexion sont : </p> <br> login : " + req.body.loginAccountCreated + "<br> Mot de passe : celui entré lors de la création de ton compte"
     }
+
+
+
 
     funcs.sendMail(email1Options)
     .then(() => {
@@ -178,24 +196,26 @@ exports.VerifyEmail = (req, res, next) => {
     // Le compte à qui on doit vérifier le mot de passe a son login enregistré dans la table 'VerificationEmail'
 
     // On récupère le login
-    funcs.bddQuery(req.conBDA, 'SELECT login FROM VerificationEmail WHERE code = ?', [req.body.code])
+    console.log(req.body)
+    funcs.bddQuery(req.conBDA, 'SELECT login FROM VerificationEmail WHERE code = ?', [req.body.token])
     .then((data) => {
         console.log("coucou9");
 
         if (data != undefined && data.length > 0) {
             loginToVerifyEmail = data[0].login;
-        }
+            console.log(data[0].login)
 
-        // On met à jour le compte correspondant
-        funcs.bddQuery(req.conBDA, "UPDATE newUsers SET emailVerifie = 1 WHERE login = ?", [loginToVerifyEmail])
-        .then(() => {
+            // On met à jour le compte correspondant
+            funcs.bddQuery(req.conBDA, "UPDATE newUsers SET email_verified = 1 WHERE login = ?", [loginToVerifyEmail])
+            .then(() => {
 
-            // Enfin on détruit le code
-            funcs.bddQuery(req.conBDA, 'DELETE FROM VerificationEmail WHERE code = ?', [req.body.code])
-            .then(() => {return funcs.sendSuccess(res, {message : "Email accepté avec succès"});})
+                // Enfin on détruit le code
+                funcs.bddQuery(req.conBDA, 'DELETE FROM VerificationEmail WHERE code = ?', [req.body.code])
+                .then(() => {return funcs.sendSuccess(res, {message : "Email accepté avec succès"});})
+                .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);})
+            })
             .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);})
-        })
-        .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);})
+        }
     })
     .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);})        
 }

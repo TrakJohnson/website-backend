@@ -117,6 +117,8 @@ var sendMail = function(mailOptions) {
 }
 
 
+
+
 module.exports = {sendMail : sendMail, bddQuery : bddQuery, hash : hash, sendError: sendError, sendSuccess : sendSuccess, whereIsAccount : whereIsAccount, currentDate : currentDate};
 
 

@@ -7,5 +7,6 @@ const userCtrl = require('../controllers/user');
 router.post('/login', userCtrl.login);
 router.post('/register', userCtrl.createAccount, userCtrl.createDemandVerification, userCtrl.SendVerificationEmail);
 router.post('/loginFromToken', auth.findLoginInToken, userCtrl.loginFromToken);
+router.post('/verify', userCtrl.VerifyEmail)
 
 module.exports = router;
