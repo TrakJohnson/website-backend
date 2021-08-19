@@ -72,22 +72,10 @@ exports.login = (req, res, next) => {
 };
 
 exports.loginFromToken = (req, res, next) => {
-
-
-    const token = req.body.token
-    var decodedToken = new String;
-    try {
-        decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET')
-    } catch(err) {
-        return funcs.sendError(res, "Token error", err);
-    }
-
-
-    const login = decodedToken.login;
         
     funcs.bddQuery(req.conBDA, 'UPDATE newUsers SET date_last_con = ? WHERE login = ?', [currentDate(), req.body.login])
     .then(() => {
-        funcs.bddQuery(req.conBDA, 'SELECT * FROM newUsers WHERE login = ?', [login])
+        funcs.bddQuery(req.conBDA, 'SELECT * FROM newUsers WHERE login = ?', [req.body.login])
         .then((data) => {
             if (data == undefined || data.length == 0) {
                 return funcs.sendError(res, "Login non reconnu", error);
