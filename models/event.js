@@ -14,12 +14,12 @@ var Event = class Event {
         this.date_close = data.date_close;
         this.num_places = data.num_places;
         this.cost_contributor = data.cost_contributor;
-        this.const_non_contributor = data.const_non_contributor;
+        this.cost_non_contributor = data.const_non_contributor;
         this.points = data.points;
         this.on_sale = data.on_sale || 0;
     }  
 
-    static updateEventData(newInfos) {
+    updateEventData(newInfos) {
         this.event_id = newInfos.event_id != undefined ? newInfos.event_id : this.event_id;
         this.title = newInfos.title != undefined ? newInfos.title : this.titled;
         this.description = newInfos.description != undefined ? newInfos.description : this.description;
@@ -32,7 +32,7 @@ var Event = class Event {
         this.date_close = newInfos.date_close != undefined ? newInfos.date_close : this.date_close;
         this.num_places = newInfos.num_places != undefined ? newInfos.num_places : this.num_places;
         this.cost_contributor = newInfos.cost_contributor != undefined ? newInfos.cost_contributor : this.cost_contributor;
-        this.const_non_contributor = newInfos.const_non_contributor != undefined ? newInfos.const_non_contributor : this.const_non_contributor;
+        this.cost_non_contributor = newInfos.cost_non_contributor != undefined ? newInfos.cost_non_contributor : this.cost_non_contributor;
         this.points = newInfos.points != undefined ? newInfos.points : this.points;
         this.on_sale = newInfos.on_sale != undefined ? newInfos.on_sale : this.on_sale;
     }
