@@ -68,7 +68,7 @@ exports.createEvent = (req, res, next) => {
     }
 }
 
-exports.modifyEvent = (req, res, next) => {
+exports.modifyBilletterie = (req, res, next) => {
     
     // D'abord on vérifie qu'on a les infos dont on a besoin
     const body = req.body;
@@ -138,7 +138,7 @@ exports.modifyEvent = (req, res, next) => {
     .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-3 & 405)", error))
 }
 
-exports.deleteEvent = (req, res, next) => {
+exports.deleteBilletterie = (req, res, next) => {
     // D'abord on vérifie qu'on a les infos dont on a besoin
     const body = req.body;
 
