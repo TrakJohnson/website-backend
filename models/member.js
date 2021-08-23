@@ -9,7 +9,7 @@ var Member = class Member {
         this.description = data.description;
     }  
 
-    static updateMemberData(newInfos) {
+    updateMemberData(newInfos) {
         this.prenom = newInfos.prenom != undefined ? newInfos.prenom : this.prenom;
         this.nom = newInfos.nom != undefined ? newInfos.nom : this.nom;
         this.login = newInfos.login != undefined ? newInfos.login : this.login;
