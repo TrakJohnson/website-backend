@@ -19,3 +19,4 @@ exports.getMembers = (req, res, next) => {
     })
     .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-0 & 405)", error))
 }
+
