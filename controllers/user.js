@@ -2,6 +2,7 @@ const funcs = require('../functions/functions');
 const jwt = require('jsonwebtoken');
 const { currentDate, sendError } = require('../functions/functions');
 const Account = require('../models/account');
+const Place = require('../models/place');
 
 getDemandedPlacesStatus = (conBda, login) => {
 
@@ -14,7 +15,7 @@ getDemandedPlacesStatus = (conBda, login) => {
             } else {
                 var placesToSendFront = [];
                 data.forEach(place => {
-                    placesToSendFront.push(place);
+                    placesToSendFront.push(new Place(place));
                 });
                 resolve(placesToSendFront);
             }
