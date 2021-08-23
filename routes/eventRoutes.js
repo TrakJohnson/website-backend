@@ -6,31 +6,21 @@ const { route } = require('./userRoutes');
 
 
 // Fonctions communes à tous les events
-router.post('/getOneEvent', eventCtrl.getOneEvent)
+router.post('/getOneEvent', eventCtrl.getOneEvent);
 router.get('/getAllEvents', eventCtrl.getAllEvents);
-router.post('/getEventsTocome', eventCtrl.getEventsTocome);
+router.get('/getEventsTocome', eventCtrl.getEventsTocome);
 
 // Manage billeterie
-<<<<<<< HEAD
+router.get('/getBilletteriesToCome', eventCtrl.getBilletteriesToCome);
+router.get('/getAllBilletteries', eventCtrl.getAllBilletteries);
+router.post("/closeBilletterie", eventCtrl.closeBilletterie);
+router.post("/reSaleBilletterie", eventCtrl.reSaleBilletterie);
+router.post("/givePlaceToUser", eventCtrl.givePlaceToUser);
+router.post("/retirePlaceToUser", eventCtrl.retirePlaceToUser);
+
+// Management des events hors billetterie (pas de places à gérer) is_billetterie = 0
 router.post('/createEvent', eventCtrl.createEvent);
 router.post('/modifyEvent', eventCtrl.modifyEvent);
 router.post('/deleteEvent', eventCtrl.deleteEvent);
-router.get('/getAllEvents', eventCtrl.getAllEvents);
-router.post('/getOneEvent', eventCtrl.getOneEvent)
-=======
-router.post('/createBilletterie', eventCtrl.createBilletterie);
-router.post('/modifyBilletterie', eventCtrl.modifyBilletterie);
-router.post('/deleteBilletterie', eventCtrl.deleteBilletterie);
-router.post('/getBilletteriesToCome', eventCtrl.getBilletteriesToCome);
-router.post('/getAllBilletteris', eventCtrl.getAllBilletteries)
-
-
-// Management des events hors billetterie (pas de places à gérer) is_billetterie = 0
-// router.post('/createEvent', eventCtrl.createEvent);
-// router.post('/modifyEvent', eventCtrl.createEvent);
-router.post('/deleteEvent', eventCtrl.deleteEvent);
-
-
->>>>>>> 0d297cdf7d62cb9be91a7ac1d23eaf30649e5a7a
 
 module.exports = router;

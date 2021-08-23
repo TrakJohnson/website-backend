@@ -9,4 +9,5 @@ router.post('/register', userCtrl.createAccount, userCtrl.createDemandVerificati
 router.post('/loginFromToken', auth.findLoginInToken, userCtrl.loginFromToken);
 router.post('/verify', userCtrl.VerifyEmail)
 
+
 module.exports = router;
