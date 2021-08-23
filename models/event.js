@@ -1,11 +1,14 @@
 
+options = {year: "numeric", month: "numeric", day: "numeric",
+hour: "numeric", minute: "numeric", second: "numeric",
+hour12: false};
 
 var Event = class Event {
     constructor(data) {
         this.event_id = data.event_id;
         this.title = data.title;
         this.description = data.description;
-        this.dateEvent = data.dateEvent;
+        this.dateEvent = Intl.DateTimeFormat("en-US", options).format(data.dateEvent.dateTime);
         this.thumbnail = data.thumbnail;
         this.event_place = data.event_place;
         this.pole_id = data.pole_id;
@@ -17,6 +20,7 @@ var Event = class Event {
         this.cost_non_contributor = data.const_non_contributor;
         this.points = data.points;
         this.on_sale = data.on_sale || 0;
+        this.is_billetterie = data.is_billetterie || undefined;
     }  
 
     updateEventData(newInfos) {
@@ -35,6 +39,7 @@ var Event = class Event {
         this.cost_non_contributor = newInfos.cost_non_contributor != undefined ? newInfos.cost_non_contributor : this.cost_non_contributor;
         this.points = newInfos.points != undefined ? newInfos.points : this.points;
         this.on_sale = newInfos.on_sale != undefined ? newInfos.on_sale : this.on_sale;
+        this.is_billetterie = newInfos.is_billetterie != undefined ? newInfos.is_billetterie : this.is_billetterie;
     }
 }
 

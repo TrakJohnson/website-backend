@@ -6,10 +6,10 @@ const eventCtrl = require('../controllers/event');
 router.post('/getEventsTocome', eventCtrl.getEventsTocome);
 
 // Manage billeterie
-router.post('/createBilletterie', eventCtrl.createBilletterie);
-router.post('/modifyBilletterie', eventCtrl.modifyBilletterie);
-router.post('/deleteBilletterie', eventCtrl.deleteBilletterie);
+router.post('/createEvent', eventCtrl.createEvent);
+router.post('/modifyEvent', eventCtrl.modifyEvent);
+router.post('/deleteEvent', eventCtrl.deleteEvent);
 router.get('/getAllEvents', eventCtrl.getAllEvents);
-router.post('/getOneBilletterie', eventCtrl.getOneBilletterie)
+router.post('/getOneEvent', eventCtrl.getOneEvent)
 
 module.exports = router;
