@@ -8,7 +8,7 @@ const { route } = require('./userRoutes');
 // Fonctions communes à tous les events
 router.post('/getOneEvent', eventCtrl.getOneEvent);
 router.get('/getAllEvents', eventCtrl.getAllEvents);
-router.post('/getEventsTocome', eventCtrl.getEventsTocome);
+router.get('/getEventsTocome', eventCtrl.getEventsTocome);
 
 
 
@@ -16,9 +16,8 @@ router.post('/getEventsTocome', eventCtrl.getEventsTocome);
 router.post('/modifyBilletterie', eventCtrl.modifyBilletterie);
 router.post('/deleteBilletterie', eventCtrl.deleteBilletterie);
 router.post('/getBilletteriesToCome', eventCtrl.getBilletteriesToCome);
-router.post('/getAllBilletteris', eventCtrl.getAllBilletteries)
+router.post('/getAllBilletteries', eventCtrl.getAllBilletteries)
 
-// Manage billeterie
 router.get('/getBilletteriesToCome', eventCtrl.getBilletteriesToCome);
 router.get('/getAllBilletteries', eventCtrl.getAllBilletteries);
 router.post("/closeBilletterie", eventCtrl.closeBilletterie);

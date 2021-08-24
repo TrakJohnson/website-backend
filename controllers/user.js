@@ -135,6 +135,42 @@ exports.createAccount = (req, res, next) => {
     .catch((error) => {console.log(error); return funcs.sendError(res, "Erreur lors de la création du compte");})
 
 }
+
+exports.modifyAccount = (req, res, next) => {
+    const body = req.body;
+    if (body.token && body.prenom && body.nom && body.email && body.password && body.promotion) {
+        return funcs.sendError(res, "Il manque des informations pour modifier le compte !");
+    }
+    var old_email;
+    console.log(body.login);
+    funcs.bddQuery(req.conBDA, "SELECT email FROM newUsers WHERE login = ?", [body.login])
+    .then((data)=> {
+        old_email = data[0].email;
+        console.log(old_email)
+        funcs.bddQuery(req.conBDA, "UPDATE newUsers SET prenom=?, nom=?, email=?, promo=?, password=? WHERE login = ?", [body.prenom, body.nom, body.email, body.promo, body.password, body.login])
+        .then(()=> {
+            emailOptions = {
+                from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
+                to: old_email, // list of receivers
+                subject: "[Portail BDA] Modification des informations du compte", // Subject line
+                html : "<p> Bonjour, </p> <p> les informations de ton compte viennent d'être changées sur le portail BDA, si cela n'est pas le cas, contacte un administrateur.</p>"
+            }
+            funcs.sendMail(emailOptions)
+            .then((result) => {
+                console.log("Email Sent      " + result);
+                funcs.sendSuccess(res, {message : "Modifications enregistrées"})
+            })
+            .catch((err) => {
+                console.log(err)
+                return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error)
+            })
+        })
+    })
+    .catch(error => {
+        return funcs.sendError(res, "Erreur, merci de contacter un administrateur !");
+
+    })
+}
    
 
 exports.createDemandVerification = (req, res, next) => {

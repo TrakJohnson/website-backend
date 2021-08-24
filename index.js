@@ -11,6 +11,7 @@ const eventRoutes = require('./routes/eventRoutes');
 const teamRoutes = require('./routes/teamRoutes');
 const poleRoutes = require('./routes/poleRoutes');
 const recoverRoutes = require('./routes/recoverRoutes')
+const contactRoutes = require('./routes/contactRoutes')
 
 
 // BDD connection
@@ -43,6 +44,9 @@ conPortail.connect(error => {
   if (error) throw error;
   console.log("Successfully connected to the Portail's database."); 
 });
+
+
+//old way to post mail without google API, just in case
 
 // let transporter = nodemailer.createTransport(smtpTransport({
 //   service: 'gmail',
@@ -85,3 +89,4 @@ app.use('/api/event', eventRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/pole', poleRoutes);
 app.use('/api/recover', recoverRoutes);
+app.use('/api/contact', contactRoutes);

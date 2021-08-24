@@ -37,6 +37,7 @@ exports.getAllEvents = (req, res, next) => {
 }
 
 exports.getEventsTocome = (req, res, next) => {
+    console.log("events to come")
     funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE dateEvent > ?", [funcs.currentDate()])
 
     .then((data) => {
