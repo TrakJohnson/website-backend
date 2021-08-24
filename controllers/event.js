@@ -1,35 +1,52 @@
 
 const funcs = require('../functions/functions');
 const Event = require('../models/event');
+const Place = require('../models/place');
 
+const getPlacesClaimedForEvent = async (conBda, event_id) => {
+    return await funcs.bddQuery(conBDA, "SELECT * FROM newPlaces WHERE event_id = ?", [event_id])
+    .then(async data => {
+        var placesClaimed = [];
+        if (data && data.length > 0) {
+            placesClaimed = await data.map(placeData => new Place(placeData));
+        }
+        return placesClaimed;
+    })
+    .catch((error) => {console.log({error : error}); return []});
+}
 
 exports.getOneEvent = (req, res, next) =>{
-    funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE event_id = ?", [req.body.id])
-    .then((data) => {
+    funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE event_id = ?", [req.query.event_id])
+    .then(async (data) => {
         if (data == undefined || data.length <1) {
             funcs.sendError(res, "Pas d'évènement avec cet id", data)
-        }
-        else {
-            funcs.sendSuccess(res, data[0])
+        } else {
+            data[0].placesClaimed = await getPlacesClaimedForEvent(req.conBDA, req.query.event_id);
+            var event = new Event(data[0]);
+            funcs.sendSuccess(res, event);
         }
     })
-    .catch((error)=>{
-        funcs.sendError(res, "Erreur, merci de contacter un administrateur", error)
-    })
-
+    .catch((error)=>{funcs.sendError(res, "Erreur, merci de contacter un administrateur", error)})
 }
 
 exports.getAllEvents = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents", [])
-    .then((data) => {
+    .then(async (data) => {
         if (data == undefined || data.length < 1) {
             funcs.sendSuccess(res, [])
         } else {
             var eventsToSendToFrond = [];
+            const getData = async () => {
+                for (var index = 0; index < data.length - 1; index++) {
+                    const eventData = data[index];
+                    console.log({eventName : eventData.title});
+                    eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
+                    console.log({eventName : eventData.title, placesClaimed : eventData.placesClaimed, index : index});
+                    eventsToSendToFrond.push(new Event(eventData));
+                }
+            }
+            await getData();
             console.log("sent all events !");
-            data.forEach(eventData => {
-                eventsToSendToFrond.push(new Event(eventData));
-            });
             funcs.sendSuccess(res, eventsToSendToFrond);
         }
     })
@@ -39,26 +56,28 @@ exports.getAllEvents = (req, res, next) => {
 exports.getEventsTocome = (req, res, next) => {
     console.log("events to come")
     funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE dateEvent > ?", [funcs.currentDate()])
-
-    .then((data) => {
-        
+    .then(async (data) => {
         if (data == undefined || data.length < 1) {
-            
-            funcs.sendSuccess(res, [])
+            funcs.sendSuccess(res, []);
         } else {
             var eventsToSendToFrond = [];
-            data.forEach(eventData => {
-                const event = new Event(eventData)
-                console.log({eventName : event.title, data : event.dateEvent});
-                eventsToSendToFrond.push(new Event(eventData));
-            });
+            const getData = async () => {
+                for (var index = 0; index < data.length - 1; index++) {
+                    const eventData = data[index];
+                    console.log({eventName : eventData.title});
+                    eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
+                    console.log({eventName : eventData.title, placesClaimed : eventData.placesClaimed, index : index});
+                    eventsToSendToFrond.push(new Event(eventData));
+                }
+            }
+            await getData();
+            console.log({eventsToSendToFrond : eventsToSendToFrond.length});
             funcs.sendSuccess(res, eventsToSendToFrond);
+            
         }
     }) 
     .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-0 & 405)", error))
 }
-
-
 
 exports.createEvent = (req, res, next) => {
     const body = req.body;
@@ -123,7 +142,6 @@ exports.modifyBilletterie = (req, res, next) => {
                 .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error))
             })
             .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error))
-
         }
         else {
             var event = new Event(data);
@@ -293,14 +311,21 @@ exports.retirePlaceToUser = (req, res, next) => {
 
 exports.getBilletteriesToCome = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE dateEvent > ? AND is_Billetterie = 1", [funcs.currentDate()])
-    .then((data) => {
+    .then(async (data) => {
         if (data == undefined || data.length < 1) {
             funcs.sendSuccess(res, [])
         } else {
             var eventsToSendToFrond = [];
-            data.forEach(eventData => {
-                eventsToSendToFrond.push(new Event(eventData));
-            });
+            const getData = async () => {
+                for (var index = 0; index < data.length - 1; index++) {
+                    const eventData = data[index];
+                    console.log({eventName : eventData.title});
+                    eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
+                    console.log({eventName : eventData.title, placesClaimed : eventData.placesClaimed, index : index});
+                    eventsToSendToFrond.push(new Event(eventData));
+                }
+            }
+            await getData();
             funcs.sendSuccess(res, eventsToSendToFrond);
         }
     })
@@ -309,15 +334,21 @@ exports.getBilletteriesToCome = (req, res, next) => {
 
 exports.getAllBilletteries = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE is_billetterie = 1", [])
-    .then((data) => {
+    .then(async (data) => {
         if (data == undefined || data.length < 1) {
             funcs.sendSuccess(res, [])
         } else {
             var eventsToSendToFrond = [];
-            console.log("sent all events !");
-            data.forEach(eventData => {
-                eventsToSendToFrond.push(new Event(eventData));
-            });
+            const getData = async () => {
+                for (var index = 0; index < data.length - 1; index++) {
+                    const eventData = data[index];
+                    console.log({eventName : eventData.title});
+                    eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
+                    console.log({eventName : eventData.title, placesClaimed : eventData.placesClaimed, index : index});
+                    eventsToSendToFrond.push(new Event(eventData));
+                }
+            }
+            await getData();
             funcs.sendSuccess(res, eventsToSendToFrond);
         }
     })
@@ -325,6 +356,8 @@ exports.getAllBilletteries = (req, res, next) => {
 }
 
 exports.deleteEvent = (req, res, next) => {
+
+    // On a juste à supprimer l'évènement (pas de place liée)
 
     const body = req.body;
     funcs.bddQuery(req.conBDA, "DELETE FROM newEvents WHERE event_id = ?", [body.event_id])

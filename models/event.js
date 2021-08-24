@@ -21,6 +21,7 @@ var Event = class Event {
         this.points = data.points;
         this.on_sale = data.on_sale || 0;
         this.is_billetterie = data.is_billetterie || undefined;
+        this.placesClaimed = data.placesClaimed || [];
     }  
 
     updateEventData(newInfos) {
@@ -40,6 +41,7 @@ var Event = class Event {
         this.points = newInfos.points != undefined ? newInfos.points : this.points;
         this.on_sale = newInfos.on_sale != undefined ? newInfos.on_sale : this.on_sale;
         this.is_billetterie = newInfos.is_billetterie != undefined ? newInfos.is_billetterie : this.is_billetterie;
+        this.placesClaimed = newInfos.placesClaimed != undefined ? newInfos.placesClaimed : this.placesClaimed;
     }
 }
 

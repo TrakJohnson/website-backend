@@ -4,27 +4,6 @@ const { currentDate, sendError } = require('../functions/functions');
 const Account = require('../models/account');
 const Place = require('../models/place');
 
-getDemandedPlacesStatus = (conBda, login) => {
-
-    return new Promise(function(resolve, reject) {
-
-        funcs.bddQuery(conBDA, "SELECT * FROM newPlaces WHERE login = ?", [login])
-        .then((data) => {
-            if (data == undefined || data.length < 1) {
-                resolve([]);
-            } else {
-                var placesToSendFront = [];
-                data.forEach(place => {
-                    placesToSendFront.push(new Place(place));
-                });
-                resolve(placesToSendFront);
-            }
-        })
-        .catch((error) => reject(error));
-    });
-
-}
-
 exports.login = (req, res, next) => {
 
     // Gathering information of account in database
@@ -45,10 +24,19 @@ exports.login = (req, res, next) => {
                         if (data == undefined || data.length == 0) {
                             return funcs.sendError(res, "Login non reconnu", error);
                         }
-                        getDemandedPlacesStatus(req.conBda, req.body.login)
-                        .then((dataPlaces) => {
-                            data[0].placesDemanded = dataPlaces;
+                        funcs.bddQuery(conBDA, "SELECT * FROM newPlaces WHERE login = ?", [req.body.login])
+                        .then((data) => {
+                            var placesClaimed = [];
+                            if (data == undefined || data.length < 1) {
+                                // Rien à faire
+                            } else {
+                                data.forEach(place => {
+                                    placesClaimed.push(new Place(place));
+                                });
+                            }
+                            data[0].placesClaimed = placesClaimed;
                             const compteUser = new Account(data[0]);
+                            console.log({compteUser : compteUser});
                             return funcs.sendSuccess(res, {
                                 token : jwt.sign(
                                     {login : req.body.login},
@@ -56,8 +44,9 @@ exports.login = (req, res, next) => {
                                     { expiresIn: '2h'}
                                 ),
                                 compte : compteUser
-                            });  
-                        });
+                            }); 
+                        })
+                        .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);});
                     })
                     .catch((error) => {return funcs.sendError(res, "Login non reconnu", error);});
                 })
@@ -73,19 +62,26 @@ exports.login = (req, res, next) => {
 };
 
 exports.loginFromToken = (req, res, next) => {
-
-        
     funcs.bddQuery(req.conBDA, 'UPDATE newUsers SET date_last_con = ? WHERE login = ?', [currentDate(), req.body.login])
     .then(() => {
         funcs.bddQuery(req.conBDA, 'SELECT * FROM newUsers WHERE login = ?', [req.body.login])
-        .then((data) => {
-            if (data == undefined || data.length == 0) {
+        .then((dataUser) => {
+            if (dataUser == undefined || dataUser.length == 0) {
                 return funcs.sendError(res, "Login non reconnu", error);
             }
-            getDemandedPlacesStatus(req.conBda, req.body.login)
+            funcs.bddQuery(conBDA, "SELECT * FROM newPlaces WHERE login = ?", [req.body.login])
             .then((dataPlaces) => {
-                data[0].placesDemanded = dataPlaces;
-                const compteUser = new Account(data[0]);
+                var placesClaimed = [];
+                if (dataPlaces == undefined || dataPlaces.length < 1) {
+                    // Rien à faire
+                } else {
+                    dataPlaces.forEach(dataPlace => {
+                        placesClaimed.push(new Place(dataPlace));
+                    });
+                }
+                dataUser[0].placesClaimed = placesClaimed;
+                const compteUser = new Account(dataUser[0]);
+                console.log({compteUser : compteUser});
                 return funcs.sendSuccess(res, {
                     token : jwt.sign(
                         {login : req.body.login},
@@ -93,8 +89,9 @@ exports.loginFromToken = (req, res, next) => {
                         { expiresIn: '2h'}
                     ),
                     compte : compteUser
-                });  
-            });
+                }); 
+            })
+            .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);});
         })
         .catch((error) => {return funcs.sendError(res, "Login non reconnu", error);});
     })
@@ -102,6 +99,55 @@ exports.loginFromToken = (req, res, next) => {
 }
      
         
+exports.claimePlace = (req, res, next) => {
+    // D'abord on vérifie que la billetterie existe toujours et qu'elle est ouverte à la vente
+    funcs.bddQuery(req.conBDA, "SELECT on_sale FROM newEvents WHERE event_id=?", [req.body.id_billetterie])
+    .then(dataUser => {
+        if (dataUser == undefined || dataUser.length < 1) {
+            funcs.sendError(res, "Cet évènement n'existe plus ou n'est plus en vente", error);
+        } else { // Billetterie existe et est encore en vente
+            // On vérifie qu'une place n'existe pas déjà à ce nom
+            funcs.bddQuery(req.conBDA, "SELECT * FROM newPlaces WHERE event_id=? AND login=?", [req.body.id_billetterie, req.body.login])
+            .then((dataPlace) => {
+                if (dataPlace.length > 0) {
+                    funcs.sendSuccess(res, {message : "Demande enregistrée"});
+                } else {
+                    // Pas de place à ce nom, on en crée donc une
+                    funcs.bddQuery(req.conBDA, "INSERT INTO newPlaces (event_id, login, status, payed) VALUES (?, ?, ?, ?)", [req.body.id_billetterie, req.body.login, -1 /* Place non attribuée au début a priori comme l'évènement est en vente */, 0 /* Place non payée a priori */])
+                    .then(() => funcs.sendSuccess(res, {message : "Demande enregistrée"}))
+                    .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);});
+                }
+            })
+            .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);});
+        }
+    })
+    .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);});
+}
+
+exports.declaimePlace = (req, res, next) => {
+    // Pas comme claimePlace, on n'a pas à vérifier si la billetterie existe encore
+    // On a juste à demander à retirer la ligne dans la BDD, si elle n'existe pas on ne le détectera pas mais cela n'est pas grave
+    funcs.bddQuery(req.conBDA, "DELETE FROM newPlaces WHERE event_id=? AND login=?", [req.body.id_billetterie, req.body.login])
+    .then(() => funcs.sendSuccess(res, {message : "Demande retirée"}))
+    .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);});
+}
+
+exports.getPlacesClaimedByUser = (req, res, next) => {
+    console.log({reqParams : req.params, reqQuery : req.query});
+    funcs.bddQuery(conBDA, "SELECT * FROM newPlaces WHERE login = ?", [req.query.login])
+    .then((data) => {
+        if (data == undefined || data.length < 1) {
+            return funcs.sendSuccess(res, []);
+        } else {
+            var placesToSendFront = [];
+            data.forEach(place => {
+                placesToSendFront.push(new Place(place));
+            });
+            return funcs.sendSuccess(res, placesToSendFront);
+        }
+    })
+    .catch((error) => reject(error));
+}
 
 exports.createAccount = (req, res, next) => {
     console.log({"coucou0" : req.body});
@@ -133,7 +179,6 @@ exports.createAccount = (req, res, next) => {
         
     })
     .catch((error) => {console.log(error); return funcs.sendError(res, "Erreur lors de la création du compte");})
-
 }
 
 exports.modifyAccount = (req, res, next) => {

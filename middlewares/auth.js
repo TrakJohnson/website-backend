@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const funcs = require('./../functions/functions');
 
 exports.authToken = (req,res,next) => {
     try {
