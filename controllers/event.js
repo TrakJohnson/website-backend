@@ -55,7 +55,7 @@ exports.getAllEvents = (req, res, next) => {
 
 exports.getEventsTocome = (req, res, next) => {
     console.log("events to come")
-    funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE dateEvent > ?", [funcs.currentDate()])
+    funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE dateEvent_end > ?", [funcs.currentDate()])
     .then(async (data) => {
         if (data == undefined || data.length < 1) {
             funcs.sendSuccess(res, []);
