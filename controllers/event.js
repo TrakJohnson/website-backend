@@ -359,21 +359,24 @@ exports.getAllBilletteries = (req, res, next) => {
 
 exports.modifyEvent = (req, res, next) => {
     const body = req.body;
- 
 
     if (body.event_id == undefined) {
         return funcs.sendError(res, "Pas d'ID de Event fourni");
     }
 
     // Ensuite on récupère les infos actuelles de la Billetterie
-    funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE event_id = ? AND is_billetterie = 1", [body.event_id])
+    funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE event_id = ? AND is_billetterie = 0", [body.event_id])
     .then((data) => {
         if (data == undefined || data.length < 1){
             return funcs.sendError(res, "ID de Event non reconnu");
-        }
-
-        var event = new Event(data);
-        funcs.bddQuery(req.conBDA, "UPDATE newEvents SET title=?, description=?, dateEvent=?, dateEvent_end=?, event_place=?, pole_id=?, num_places=?, cost_contributor=?, cost_non_contributor=?, thumbnail = ? WHERE event_id = ?", [event.title , event.description , event.dateEvent , event.dateEvent_end, event.event_place , event.pole_id, event.date_open , event.date_close , event.num_places , event.cost_contributor,  event.cost_non_contributor, event.points, event.on_sale, body.thumbnail, body.is_billetterie,  event.event_id])
+        }  
+        console.log("here")
+        var event = new Event(data[0]);
+        
+        event.updateEventData(body);
+        console.log(body.event_place)
+        console.log(event)
+        funcs.bddQuery(req.conBDA, "UPDATE newEvents SET title=?, description=?, dateEvent=?, dateEvent_end=?, event_place=?, pole_id=?, num_places=?, cost_contributor=?, cost_non_contributor=?, thumbnail = ? WHERE event_id = ?", [event.title , event.description , event.dateEvent , event.dateEvent_end, event.event_place , event.pole_id, event.num_places , event.cost_contributor,  event.cost_non_contributor, body.thumbnail, event.event_id])
         .then(() => funcs.sendSuccess(res, {message : "Evenement modifié !"}))
         .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-2 & 405)", error))
 
@@ -388,6 +391,7 @@ exports.deleteEvent = (req, res, next) => {
     // On a juste à supprimer l'évènement (pas de place liée)
 
     const body = req.body;
+    console.log(body.event_id)
     funcs.bddQuery(req.conBDA, "DELETE FROM newEvents WHERE event_id = ?", [body.event_id])
     .then(()=> {
         funcs.sendSuccess(res, {message : "Evenement supprimé !"})
