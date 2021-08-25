@@ -9,6 +9,7 @@ var Event = class Event {
         this.title = data.title;
         this.description = data.description;
         this.dateEvent = Intl.DateTimeFormat("en-US", options).format(data.dateEvent.dateTime);
+        this.dateEvent_end = Intl.DateTimeFormat("en-US", options).format(data.dateEvent_end.dateTime);
         this.thumbnail = data.thumbnail;
         this.event_place = data.event_place;
         this.pole_id = data.pole_id;
@@ -29,6 +30,7 @@ var Event = class Event {
         this.title = newInfos.title != undefined ? newInfos.title : this.titled;
         this.description = newInfos.description != undefined ? newInfos.description : this.description;
         this.dateEvent = newInfos.dateEvent != undefined ? newInfos.dateEvent : this.dateEvent;
+        this.dateEvent = newInfos.dateEvent_end != undefined ? newInfos.dateEvent_end : this.dateEvent_end;
         this.event_place = newInfos.event_place != undefined ? newInfos.event_place : this.event_place;
         this.thumbnail = newInfos.thumbnail != undefined ? newInfos.thumbnail : this.thumbnail;
         this.pole_id = newInfos.pole_id != undefined ? newInfos.pole_id : this.pole_id;

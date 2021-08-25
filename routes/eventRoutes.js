@@ -21,7 +21,7 @@ router.post('/deleteBilletterie', eventCtrl.deleteBilletterie);
 
 // Management des events hors billetterie (pas de places à gérer) is_billetterie = 0
 router.post('/createEvent', eventCtrl.createEvent);
-// router.post('/modifyEvent', eventCtrl.modifyEvent);
+router.post('/modifyEvent', eventCtrl.modifyEvent);
 router.post('/deleteEvent', eventCtrl.deleteEvent);
 
 module.exports = router;
