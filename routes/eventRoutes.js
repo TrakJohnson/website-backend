@@ -9,6 +9,7 @@ const { route } = require('./userRoutes');
 router.get('/getOneEvent', eventCtrl.getOneEvent);
 router.get('/getAllEvents', eventCtrl.getAllEvents);
 router.get('/getEventsTocome', eventCtrl.getEventsTocome);
+router.get('/getEventsForCalendar', eventCtrl.getEventsForCalendar)
 
 router.get('/getBilletteriesToCome', eventCtrl.getBilletteriesToCome);
 router.get('/getAllBilletteries', eventCtrl.getAllBilletteries);

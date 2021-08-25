@@ -78,6 +78,12 @@ var currentDate = function() {
 
 }
 
+var oneYAgoDate = function() {
+    var date = new Date()
+    date.setFullYear( date.getFullYear() - 1 );
+    return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
+}
+
 
 
 
@@ -119,7 +125,7 @@ var sendMail = function(mailOptions) {
 
 
 
-module.exports = {sendMail : sendMail, bddQuery : bddQuery, hash : hash, sendError: sendError, sendSuccess : sendSuccess, whereIsAccount : whereIsAccount, currentDate : currentDate};
+module.exports = {oneYAgoDate : oneYAgoDate, sendMail : sendMail, bddQuery : bddQuery, hash : hash, sendError: sendError, sendSuccess : sendSuccess, whereIsAccount : whereIsAccount, currentDate : currentDate};
 
 
 

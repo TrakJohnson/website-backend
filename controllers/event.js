@@ -55,7 +55,7 @@ exports.getAllEvents = (req, res, next) => {
 
 exports.getEventsTocome = (req, res, next) => {
     console.log("events to come")
-    funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE dateEvent_end > ?", [funcs.currentDate()])
+    funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE dateEvent > ?", [funcs.currentDate()])
     .then(async (data) => {
         if (data == undefined || data.length < 1) {
             funcs.sendSuccess(res, []);
@@ -78,6 +78,33 @@ exports.getEventsTocome = (req, res, next) => {
     }) 
     .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-0 & 405)", error))
 }
+
+
+exports.getEventsForCalendar = (req, res, next) => {
+    console.log("calendar goes brrr")
+    // on ne prend que les évènements de l'année en cours et que les informations qui nous intéressent
+    funcs.bddQuery(req.conBDA, "SELECT event_id, title, dateEvent, dateEvent_end, pole_id, is_billetterie FROM newEvents WHERE dateEvent > ?", [funcs.oneYAgoDate()])
+    .then(async (data) => {
+        if (data == undefined || data.length < 1) {
+            funcs.sendSuccess(res, []);
+        } else {
+            console.log({events : data})
+            funcs.sendSuccess(res, data);
+            
+        }
+    }) 
+    .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-0 & 405)", error))
+
+}
+
+
+
+
+
+
+
+
+
 
 exports.createEvent = (req, res, next) => {
     const body = req.body;
@@ -398,3 +425,4 @@ exports.deleteEvent = (req, res, next) => {
     })
     .catch((error) => funcs.sendError(res, "Erreur lors de la suppression de l'évènement, contactez un administrateur.", error))
 }
+
