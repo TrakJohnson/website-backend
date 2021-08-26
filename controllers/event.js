@@ -37,7 +37,7 @@ exports.getAllEvents = (req, res, next) => {
         } else {
             var eventsToSendToFrond = [];
             const getData = async () => {
-                for (var index = 0; index < data.length - 1; index++) {
+                for (var index = 0; index < data.length ; index++) {
                     const eventData = data[index];
                     eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
                     eventsToSendToFrond.push(new Event(eventData));
@@ -58,7 +58,7 @@ exports.getEventsTocome = (req, res, next) => {
         } else {
             var eventsToSendToFrond = [];
             const getData = async () => {
-                for (var index = 0; index < data.length - 1; index++) {
+                for (var index = 0; index < data.length; index++) {
                     const eventData = data[index];
                     eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
                     eventsToSendToFrond.push(new Event(eventData));
@@ -106,7 +106,6 @@ exports.createEvent = (req, res, next) => {
 }
 
 exports.modifyBilletterie = (req, res, next) => {
-    
     // D'abord on vérifie qu'on a les infos dont on a besoin
     const body = req.body;
     
@@ -115,14 +114,13 @@ exports.modifyBilletterie = (req, res, next) => {
     if (body.event_id == undefined) {
         return funcs.sendError(res, "Pas d'ID de Event fourni");
     }
-
     // Ensuite on récupère les infos actuelles de la Billetterie
-    funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE event_id = ? AND is_billetterie = 1", [body.event_id])
+    funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE event_id = ?", [body.event_id])
     .then((data) => {
         if (data == undefined || data.length < 1){
             return funcs.sendError(res, "ID de Event non reconnu");
         }
-
+        
         if (body.sendMail) {
 
             funcs.bddQuery(req.conBDA, "SELECT newUsers.email FROM newUsers JOIN newPlaces ON newUsers.login = newPlaces.login WHERE newPlaces.event_id = ?", [req.body.event_id])
@@ -134,13 +132,12 @@ exports.modifyBilletterie = (req, res, next) => {
                 }
                 funcs.bddQuery(req.conBDA, "SELECT newUsers.email FROM newUsers JOIN newEvents ON newUsers.login = newEvents.login_creator WHERE newEvents.event_id = ?", [req.body.event_id])
                 .then((data) => {
-
+                    
                     if (data != undefined && data.length > 0) {
                         mail_list.push(data[0].email);
                     }
 
                     emails = mail_list.toString();
-                    
                     emailOptions = {
                         from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
                         to: emails, // list of receivers
@@ -152,7 +149,8 @@ exports.modifyBilletterie = (req, res, next) => {
 
                     var event = new Event(data);
                     event.updateEventData(body);
-                    funcs.bddQuery(req.conBDA, "UPDATE newEvents SET title=?, description=?, dateEvent=?, dateEvent_end=?, event_place=?, pole_id=?, date_open=?, date_close=?, num_places=?, cost_contributor=?, cost_non_contributor=?, points=?, on_sale = ?, thumbnail = ?, is_billetterie = ?  WHERE event_id = ?", [event.title , event.description , event.dateEvent, event.dateEvent_end , event.event_place , event.pole_id, event.date_open , event.date_close , event.num_places , event.cost_contributor,  event.cost_non_contributor, event.points, event.on_sale, body.thumbnail, body.is_billetterie,  event.event_id])
+                    funcs.bddQuery(req.conBDA, "UPDATE newEvents SET title=?, description=?, dateEvent=?, dateEvent_end=?, event_place=?, pole_id=?, date_open=?, date_close=?, num_places=?, cost_contributor=?, cost_non_contributor=?, points=?, on_sale = ?, thumbnail = ? is_billetterie = ? WHERE event_id = ?", 
+                                                    [event.title , event.description , event.dateEvent, event.dateEvent_end , event.event_place , event.pole_id, event.date_open , event.date_close , event.num_places , event.cost_contributor,  event.cost_non_contributor, event.points, event.on_sale, body.thumbnail, 1, event.event_id])
                     .then(() => funcs.sendSuccess(res, {message : "Evenement modifié !"}))
                     .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-2 & 405)", error))
                 })
@@ -163,7 +161,7 @@ exports.modifyBilletterie = (req, res, next) => {
         else {
             var event = new Event(data);
             event.updateEventData(body);
-            funcs.bddQuery(req.conBDA, "UPDATE newEvents SET title=?, description=?, dateEvent=?, dateEvent_end=?, event_place=?, pole_id=?, date_open=?, date_close=?, num_places=?, cost_contributor=?, cost_non_contributor=?, points=?, on_sale = ?, thumbnail = ?, is_billetterie = ?  WHERE event_id = ?", [event.title , event.description , event.dateEvent, event.dateEvent_end , event.event_place , event.pole_id, event.date_open , event.date_close , event.num_places , event.cost_contributor,  event.cost_non_contributor, event.points, event.on_sale, body.thumbnail, body.is_billetterie, event.event_id])
+            funcs.bddQuery(req.conBDA, "UPDATE newEvents SET title=?, description=?, dateEvent=?, dateEvent_end=?, event_place=?, pole_id=?, date_open=?, date_close=?, num_places=?, cost_contributor=?, cost_non_contributor=?, points=?, on_sale = ?, thumbnail = ?, is_billetterie = ?  WHERE event_id = ?", [event.title , event.description , event.dateEvent, event.dateEvent_end , event.event_place , event.pole_id, event.date_open , event.date_close , event.num_places , event.cost_contributor,  event.cost_non_contributor, event.points, event.on_sale, body.thumbnail, true, event.event_id])
             .then(() => funcs.sendSuccess(res, {message : "Evenement modifié !"}))
             .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-2 & 405)", error))
         }
@@ -324,10 +322,11 @@ exports.getBilletteriesToCome = (req, res, next) => {
         } else {
             var eventsToSendToFrond = [];
             const getData = async () => {
-                for (var index = 0; index < data.length - 1; index++) {
+                for (var index = 0; index < data.length; index++) {
                     const eventData = data[index];
                     eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
-                    eventsToSendToFrond.push(new Event(eventData));
+                    var event_to_push = new Event(eventData)
+                    eventsToSendToFrond.push(event_to_push);
                 }
             }
             await getData();
@@ -345,7 +344,7 @@ exports.getAllBilletteries = (req, res, next) => {
         } else {
             var eventsToSendToFrond = [];
             const getData = async () => {
-                for (var index = 0; index < data.length - 1; index++) {
+                for (var index = 0; index < data.length; index++) {
                     const eventData = data[index];
                     eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
                     eventsToSendToFrond.push(new Event(eventData));

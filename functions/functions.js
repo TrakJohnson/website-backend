@@ -89,14 +89,14 @@ var oneYAgoDate = function() {
 const CLIENT_ID = '835286550118-pbprqfpea429517nv00gr3cnjalesgg6.apps.googleusercontent.com'
 const CLIENT_SECRET = '8zBFpPxdyzaUiO0_CBTJA-WM'
 const REDIRECT_URL = 'https://developers.google.com/oauthplayground'
-const REFRESH_TOKEN = '1//04ZXxRs5Mb36mCgYIARAAGAQSNwF-L9IreZKmLrY_kVJgQdTbqVIleZM6l3qbnGKa74I5Td0fzpGd2t8ikhhvvi0BJChGf-QhP04'
+const REFRESH_TOKEN = '1//04n-bNw5d9m8aCgYIARAAGAQSNwF-L9IrKSZYJJ-cmxz-lesPTFlyVdQeutlV48Bhx4GIBzyVyE3DR8OP6W4LZ6mVaPYyT_V1PIk'
 
 
 const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL)
 oAuth2Client.setCredentials({refresh_token : REFRESH_TOKEN})
 
 var sendMail = function(mailOptions) {
-    
+ 
     try {
     const accessToken = oAuth2Client.getAccessToken();
 
@@ -113,8 +113,9 @@ var sendMail = function(mailOptions) {
     });
 
     const result = transport.sendMail(mailOptions);
+   
     return result;
-    } catch (error) {
+    } catch (error) { 
     }
 }
 

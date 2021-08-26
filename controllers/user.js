@@ -5,16 +5,13 @@ const Account = require('../models/account');
 const Place = require('../models/place');
 
 exports.login = (req, res, next) => {
-
     // Gathering information of account in database
     funcs.bddQuery(req.conBDA, 'SELECT password FROM newUsers WHERE login = ?', [req.body.login])
-    .then((data) => {
-        if (data != undefined & data.length > 0) {
+    .then((data0) => {
+        if (data0 != undefined & data0.length > 0) {
             // Gather true password's infos
-            const truePwdInfos = data[0].password;
-
+            const truePwdInfos = data0[0].password;
             if (truePwdInfos == req.body.password) {
-
                 // Update last connection date of this user
                 funcs.bddQuery(req.conBDA, 'UPDATE newUsers SET date_last_con = ? WHERE login = ?', [currentDate(), req.body.login])
                 .then(() => {
@@ -24,12 +21,12 @@ exports.login = (req, res, next) => {
                             return funcs.sendError(res, "Login non reconnu", error);
                         }
                         funcs.bddQuery(conBDA, "SELECT * FROM newPlaces WHERE login = ?", [req.body.login])
-                        .then((data) => {
+                        .then((data2) => {
                             var placesClaimed = [];
-                            if (data == undefined || data.length < 1) {
+                            if (data2 == undefined || data2.length < 1) {
                                 // Rien à faire
                             } else {
-                                data.forEach(place => {
+                                data2.forEach(place => {
                                     placesClaimed.push(new Place(place));
                                 });
                             }
@@ -185,7 +182,7 @@ exports.modifyAccount = (req, res, next) => {
             emailOptions = {
                 from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
                 to: old_email, // list of receivers
-                subject: "[Portail BDA] Modification des informations du compte", // Subject line
+                subject: "[BDA] Modification des informations du compte", // Subject line
                 html : "<p> Bonjour, </p> <p> les informations de ton compte viennent d'être changées sur le portail BDA, si cela n'est pas le cas, contacte un administrateur.</p>"
             }
             funcs.sendMail(emailOptions)
@@ -193,9 +190,14 @@ exports.modifyAccount = (req, res, next) => {
                 funcs.sendSuccess(res, {message : "Modifications enregistrées"})
             })
             .catch((err) => {
-                return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error)
+                return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", err)
             })
         })
+        .catch((err) => {
+            
+            return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", err)
+        })
+
     })
     .catch(error => {
         return funcs.sendError(res, "Erreur, merci de contacter un administrateur !");
@@ -235,7 +237,7 @@ exports.SendVerificationEmail  = (req, res, next) => {
     email2Options = {
         from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
         to: req.body.email, // list of receivers
-        subject: "[BDA] Verification adresse mail", // Subject line
+        subject: "[BDA] Informations de connexion", // Subject line
         html : "<p> Bonjour, </p> <p> Tes informations de connexion sont : </p> <br> login : " + req.body.loginAccountCreated + "<br> Mot de passe : celui entré lors de la création de ton compte"
     }
 

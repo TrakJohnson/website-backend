@@ -30,7 +30,7 @@ exports.sendRecoverMail = (req, res, next) => {
     emailOptions = {
         from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
         to: req.body.emailAdressToSend, // list of receivers
-        subject: "[Portail BDA] Changement de mot de passe", // Subject line
+        subject: "[BDA] Changement de mot de passe", // Subject line
         html : "<p> Bonjour, </p> <p> tu as demandé à changer ton mot de passe sur le site du BDA, si cela n'est pas le cas, contacte les administrateurs. <br> Pour changer ton mot de passe, clique sur ce lien : <br> http://localhost:4200/recover/change-password/" + req.body.token + "<br> Attention : ce lien n'est valable que 24h. </p>"
     }
 
