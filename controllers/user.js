@@ -14,7 +14,6 @@ exports.login = (req, res, next) => {
             const truePwdInfos = data[0].password;
 
             if (truePwdInfos == req.body.password) {
-                console.log("authentified ! ");
 
                 // Update last connection date of this user
                 funcs.bddQuery(req.conBDA, 'UPDATE newUsers SET date_last_con = ? WHERE login = ?', [currentDate(), req.body.login])
@@ -36,7 +35,6 @@ exports.login = (req, res, next) => {
                             }
                             data[0].placesClaimed = placesClaimed;
                             const compteUser = new Account(data[0]);
-                            console.log({compteUser : compteUser});
                             return funcs.sendSuccess(res, {
                                 token : jwt.sign(
                                     {login : req.body.login},
@@ -81,7 +79,6 @@ exports.loginFromToken = (req, res, next) => {
                 }
                 dataUser[0].placesClaimed = placesClaimed;
                 const compteUser = new Account(dataUser[0]);
-                console.log({compteUser : compteUser});
                 return funcs.sendSuccess(res, {
                     token : jwt.sign(
                         {login : req.body.login},
@@ -133,7 +130,6 @@ exports.declaimePlace = (req, res, next) => {
 }
 
 exports.getPlacesClaimedByUser = (req, res, next) => {
-    console.log({reqParams : req.params, reqQuery : req.query});
     funcs.bddQuery(conBDA, "SELECT * FROM newPlaces WHERE login = ?", [req.query.login])
     .then((data) => {
         if (data == undefined || data.length < 1) {
@@ -150,7 +146,6 @@ exports.getPlacesClaimedByUser = (req, res, next) => {
 }
 
 exports.createAccount = (req, res, next) => {
-    console.log({"coucou0" : req.body});
 
     const body = req.body;
     if (body.loginAccountCreated && body.prenom && body.nom && body.email && body.password && body.admin && body.promotion) {
@@ -159,26 +154,21 @@ exports.createAccount = (req, res, next) => {
     //we have to chekc if nobody has the same login yet
     funcs.bddQuery(req.conBDA, "SELECT COUNT(*) FROM newUsers WHERE login LIKE ?", req.body.loginAccountCreated + '%') //retourne le nombre de compte ayant eu le meme login assigné par défaut
     .then((data) => {
-        console.log("result :  " + data[0]['COUNT(*)'])
 
         var index = data[0]['COUNT(*)'];
 
         if (index != 0) {
-            console.log("homonyme")
             req.body.loginAccountCreated = req.body.loginAccountCreated + String(index + 1);
         }
-
-        console.log(req.body.loginAccountCreated)
         // We have all info we need to create account
         const creationDate = currentDate();
         const lastConDate = currentDate();
-        console.log(body.password)
         funcs.bddQuery(req.conBDA, 'INSERT INTO newUsers (login, prenom, nom, email, email_verified, password, admin, contributor, date_creation, date_last_con, promo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); ', [req.body.loginAccountCreated, body.prenom, body.nom, body.email, false /*email verified : no*/, body.password, body.admin, 0 /* not contributor by default*/ , creationDate, lastConDate, body.promotion])
-        .then(() => {console.log("coucou2"); next()})
-        .catch((error) => {console.log(error); return funcs.sendError(res, "Erreur lors de la création du compte");})
+        .then(() => {next()})
+        .catch((error) => {return funcs.sendError(res, "Erreur lors de la création du compte");})
         
     })
-    .catch((error) => {console.log(error); return funcs.sendError(res, "Erreur lors de la création du compte");})
+    .catch((error) => {return funcs.sendError(res, "Erreur lors de la création du compte");})
 }
 
 exports.modifyAccount = (req, res, next) => {
@@ -187,11 +177,9 @@ exports.modifyAccount = (req, res, next) => {
         return funcs.sendError(res, "Il manque des informations pour modifier le compte !");
     }
     var old_email;
-    console.log(body.login);
     funcs.bddQuery(req.conBDA, "SELECT email FROM newUsers WHERE login = ?", [body.login])
     .then((data)=> {
         old_email = data[0].email;
-        console.log(old_email)
         funcs.bddQuery(req.conBDA, "UPDATE newUsers SET prenom=?, nom=?, email=?, promo=?, password=? WHERE login = ?", [body.prenom, body.nom, body.email, body.promo, body.password, body.login])
         .then(()=> {
             emailOptions = {
@@ -202,11 +190,9 @@ exports.modifyAccount = (req, res, next) => {
             }
             funcs.sendMail(emailOptions)
             .then((result) => {
-                console.log("Email Sent      " + result);
                 funcs.sendSuccess(res, {message : "Modifications enregistrées"})
             })
             .catch((err) => {
-                console.log(err)
                 return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error)
             })
         })
@@ -222,13 +208,11 @@ exports.createDemandVerification = (req, res, next) => {
     let num = Math.floor(Math.random() * (1_000_000_000))
     let hash = funcs.hash(num.toString());
     let DateCreation = funcs.currentDate();
-    console.log({"coucou3" : hash, num : num});
 
     // inscription des informations dans la base de données de récupération de mots de passe, puis création du token et envoi à la fonction suivante
     funcs.bddQuery(req.conBDA, "INSERT INTO VerificationEmail (login, code, dateDemand) VALUES (?, ?, ?)", [req.body.loginAccountCreated, hash, DateCreation])
     .then(() => {
         // Generation du WebToken
-        console.log("coucou4");
         req.body.hash = hash;
         next();
     })
@@ -238,7 +222,6 @@ exports.createDemandVerification = (req, res, next) => {
 exports.SendVerificationEmail  = (req, res, next) => {
 
     // Email for verification of address mail
-    console.log("coucou5");
 
     email1Options = {
         from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
@@ -261,14 +244,11 @@ exports.SendVerificationEmail  = (req, res, next) => {
 
     funcs.sendMail(email1Options)
     .then(() => {
-        console.log("Email 1 sent");
         funcs.sendMail(email2Options)
         .then (() => {
-            console.log("Email 2 sent");
             return funcs.sendSuccess(res, {message : "Utilisateur créé !", loginAssigned : req.body.loginAccountCreated});
         })
         .catch((err) => {
-            console.log(err)
             return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-1 & 405)", error);
         })
     })
@@ -283,14 +263,11 @@ exports.VerifyEmail = (req, res, next) => {
     // Le compte à qui on doit vérifier le mot de passe a son login enregistré dans la table 'VerificationEmail'
 
     // On récupère le login
-    console.log(req.body)
     funcs.bddQuery(req.conBDA, 'SELECT login FROM VerificationEmail WHERE code = ?', [req.body.code])
     .then((data) => {
-        console.log("coucou9  " + data);
 
         if (data != undefined && data.length > 0) {
             loginToVerifyEmail = data[0].login;
-            console.log(data[0].login)
 
             // On met à jour le compte correspondant
             funcs.bddQuery(req.conBDA, "UPDATE newUsers SET email_verified = 1 WHERE login = ?", [loginToVerifyEmail])

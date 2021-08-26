@@ -26,7 +26,6 @@ var hash = function(word) {
 
 var sendError = function(res, message, error = "") {
     if (error != "") {
-        console.log({errorCatched : error});
     }
     if (!res.headersSent){ 
         return res.status(400).send({message : message});
@@ -35,7 +34,6 @@ var sendError = function(res, message, error = "") {
 
 var sendSuccess = function(res, object) {
     if (!res.headersSent){ 
-        // console.log({objectOfSuccess: object});
         return res.status(200).send(object);
     }
 }
@@ -113,12 +111,10 @@ var sendMail = function(mailOptions) {
         accessToken: accessToken,
         },
     });
-    console.log("here")
 
     const result = transport.sendMail(mailOptions);
     return result;
     } catch (error) {
-        console.log(error)
     }
 }
 

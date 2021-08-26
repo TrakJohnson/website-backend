@@ -3,7 +3,6 @@ const funcs = require('../functions/functions');
 const Pole = require('../models/pole');
 
 exports.getPoles = (req, res, next) => {
-    console.log("lala");
     funcs.bddQuery(req.conBDA, "SELECT * FROM newPoles")
     .then((data) => {
         if (data == undefined || data.length < 1) {
@@ -13,7 +12,6 @@ exports.getPoles = (req, res, next) => {
             data.forEach(poleData => {
                 polesToSendToFrond.push(new Pole(poleData));
             });
-            console.log({poles : polesToSendToFrond});
             funcs.sendSuccess(res, polesToSendToFrond);
         }
     })

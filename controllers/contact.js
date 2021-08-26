@@ -5,7 +5,6 @@ exports.sendMail = (req, res, next) => {
 
     const body = req.body;
     
-    console.log(body);
 
     emailOptions = {
         from: '"Message du site" <bda.rsi.minesparis@gmail.com>', // sender address
@@ -13,14 +12,12 @@ exports.sendMail = (req, res, next) => {
         subject: "[Portail BDA] " + body.sujet, // Subject line
         html : "<p> Bonjour, </p> <p> Un message vient d'être envoyé depuis l'onglet contact du site par " + body.nom + " en utilisant son adresse mail " + body.email + " concernant le sujet : " + body.sujet + ". Voici le message : </p> <br> <p> " + body.contenu + " </p>"
     }
-    console.log(emailOptions);
     funcs.sendMail(emailOptions)
     .then(()=> {
         funcs.sendSuccess(res, {message : "Message envoyé"})
         
     })
     .catch((error) => {
-        console.log(error);
         funcs.sendError(res, "Le message n'a pas pu être envoyé, merci de contacter un administrateur par un autre moyen", error)
     })
 

@@ -36,18 +36,15 @@ exports.sendRecoverMail = (req, res, next) => {
 
     funcs.sendMail(emailOptions)
     .then((result) => {
-        console.log("Email Sent      " + result);
         funcs.sendSuccess(res, {message : "Un mail a été envoyé, merci de consulter votre boitre mail."})
     })
     .catch((err) => {
-        console.log(err)
         return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 302 & 412)", error)
     })
 };
 
 
 exports.changePassword = (req, res, next) => {
-    console.log(req.body.login)
 
     funcs.bddQuery(req.conBDA, "UPDATE newUsers SET password = ? WHERE login = ?", [req.body.newPassword, req.body.login])
     .then(()=>{

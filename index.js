@@ -27,7 +27,6 @@ conBDA = mysql.createConnection({
 // open the MySQL connection
 conBDA.connect(error => {
   if (error) throw error;
-  console.log("Successfully connected to the BDA's database."); 
 });
 
   // Portail one
@@ -42,7 +41,6 @@ conPortail = mysql.createConnection({
 // open the MySQL connection
 conPortail.connect(error => {
   if (error) throw error;
-  console.log("Successfully connected to the Portail's database."); 
 });
 
 
@@ -60,7 +58,6 @@ conPortail.connect(error => {
 const app = express();
 
 app.listen(4000, function () {
-  console.log("Application d'exemple écoutant sur le port 4000 !");
 });
 
 app.use(express.json({limit: '8mb'}));

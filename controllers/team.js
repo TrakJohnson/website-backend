@@ -10,7 +10,6 @@ exports.getMembers = (req, res, next) => {
         if (data == undefined || data.length < 1) {
             funcs.sendSuccess(res, [])
         } else {
-            console.log(data)
             funcs.sendSuccess(res, data);
         }
     })

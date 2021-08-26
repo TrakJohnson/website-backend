@@ -12,7 +12,7 @@ const getPlacesClaimedForEvent = async (conBda, event_id) => {
         }
         return placesClaimed;
     })
-    .catch((error) => {console.log({error : error}); return []});
+    .catch((error) => {return []});
 }
 
 exports.getOneEvent = (req, res, next) =>{
@@ -39,14 +39,11 @@ exports.getAllEvents = (req, res, next) => {
             const getData = async () => {
                 for (var index = 0; index < data.length - 1; index++) {
                     const eventData = data[index];
-                    console.log({eventName : eventData.title});
                     eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
-                    console.log({eventName : eventData.title, placesClaimed : eventData.placesClaimed, index : index});
                     eventsToSendToFrond.push(new Event(eventData));
                 }
             }
             await getData();
-            console.log("sent all events !");
             funcs.sendSuccess(res, eventsToSendToFrond);
         }
     })
@@ -54,7 +51,6 @@ exports.getAllEvents = (req, res, next) => {
 }
 
 exports.getEventsTocome = (req, res, next) => {
-    console.log("events to come")
     funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE dateEvent > ?", [funcs.currentDate()])
     .then(async (data) => {
         if (data == undefined || data.length < 1) {
@@ -64,14 +60,11 @@ exports.getEventsTocome = (req, res, next) => {
             const getData = async () => {
                 for (var index = 0; index < data.length - 1; index++) {
                     const eventData = data[index];
-                    console.log({eventName : eventData.title});
                     eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
-                    console.log({eventName : eventData.title, placesClaimed : eventData.placesClaimed, index : index});
                     eventsToSendToFrond.push(new Event(eventData));
                 }
             }
             await getData();
-            console.log({eventsToSendToFrond : eventsToSendToFrond.length});
             funcs.sendSuccess(res, eventsToSendToFrond);
             
         }
@@ -81,14 +74,12 @@ exports.getEventsTocome = (req, res, next) => {
 
 
 exports.getEventsForCalendar = (req, res, next) => {
-    console.log("calendar goes brrr")
     // on ne prend que les évènements de l'année en cours et que les informations qui nous intéressent
     funcs.bddQuery(req.conBDA, "SELECT event_id, title, dateEvent, dateEvent_end, pole_id, is_billetterie FROM newEvents WHERE dateEvent > ?", [funcs.oneYAgoDate()])
     .then(async (data) => {
         if (data == undefined || data.length < 1) {
             funcs.sendSuccess(res, []);
         } else {
-            console.log({events : data})
             funcs.sendSuccess(res, data);
             
         }
@@ -118,7 +109,6 @@ exports.modifyBilletterie = (req, res, next) => {
     
     // D'abord on vérifie qu'on a les infos dont on a besoin
     const body = req.body;
-    console.log(body.sendMail)
     
     var mail_list = []
 
@@ -207,7 +197,6 @@ exports.deleteBilletterie = (req, res, next) => {
             mail_list.push(data[0].email)
             
             emails = mail_list.toString()
-            console.log(mails)
             // Ensuite on supprime les places relatives à cet évènement
             funcs.bddQuery(req.conBDA, "DELETE FROM newPlaces WHERE event_id = ?", [body.event_id])
             .then(() => {
@@ -221,7 +210,6 @@ exports.deleteBilletterie = (req, res, next) => {
                         subject: "[BDA] Suppression d'une de vos billetteries", // Subject line
                         html : "<p> Bonjour, </p> <p> Une billetterie te concernant vient d'être supprimé, n'hésite pas à consulter le <a href = 'http://localhost:4200'> portail BDA </a> pour plus d'informations. (code suppression :" + body.event_id + ")."
                     }
-                    console.log("Event supprimée, id :" + event_id)
                     
                     funcs.sendSuccess(res, {message : "Evenement supprimé !"})
                     
@@ -239,7 +227,6 @@ exports.deleteBilletterie = (req, res, next) => {
 };
 
 exports.closeBilletterie = (req, res, next) => {
-    console.log({bodyClose : req.body})
     funcs.bddQuery(req.conBDA, "SELECT num_places, points, on_sale FROM newEvents WHERE event_id=?", [req.body.id_billetterie])
     .then(async data => {
         if (data != undefined && data.length > 0) {
@@ -270,22 +257,16 @@ exports.closeBilletterie = (req, res, next) => {
 exports.reSaleBilletterie = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT points, on_sale FROM newEvents WHERE event_id=?", [req.body.id_billetterie])
     .then(async data => {
-        console.log({data : data});
         if (data != undefined && data.length > 0) {
             const infos = data[0];
-            console.log("here");
             const pointsToAdd = infos.points, onSale = infos.onSale;
             if (!onSale) {
                 funcs.bddQuery(req.conBDA, "SELECT * FROM newPlaces WHERE event_id=? && status=1", [req.body.id_billetterie])
                 .then(async data => {
-                    console.log({data2 : data});
                     for (var i = 0; i < data.length; i++) {
-                        console.log({datai : data[i], index : i});
                         await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points-? WHERE login=?", [pointsToAdd, data[i].login]);
                     }
-                    console.log("here2");
                     await funcs.bddQuery(req.conBDA, "UPDATE newEvents SET on_sale=1 WHERE event_id=?", [req.body.id_billetterie]);
-                    console.log("here3");
                     await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=-1 WHERE event_id=?", [req.body.id_billetterie]);
                     funcs.sendSuccess(res, {message : "Evenement remis en vente avec succès !"})
                 })
@@ -307,7 +288,6 @@ exports.givePlaceToUser = (req, res, next) => {
             const pointsToAdd = infos.points, numPlaces = infos.num_places;
             funcs.bddQuery(req.conBDA, "SELECT COUNT(*) FROM newPlaces WHERE event_id=? AND status=1", [req.body.id_billetterie])
             .then(async data => {
-                console.log({dataCount : data});
                 const numPlacesAttributed = data[0];
 
                 if (numPlacesAttributed < numPlaces) {
@@ -346,9 +326,7 @@ exports.getBilletteriesToCome = (req, res, next) => {
             const getData = async () => {
                 for (var index = 0; index < data.length - 1; index++) {
                     const eventData = data[index];
-                    console.log({eventName : eventData.title});
                     eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
-                    console.log({eventName : eventData.title, placesClaimed : eventData.placesClaimed, index : index});
                     eventsToSendToFrond.push(new Event(eventData));
                 }
             }
@@ -369,9 +347,7 @@ exports.getAllBilletteries = (req, res, next) => {
             const getData = async () => {
                 for (var index = 0; index < data.length - 1; index++) {
                     const eventData = data[index];
-                    console.log({eventName : eventData.title});
                     eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
-                    console.log({eventName : eventData.title, placesClaimed : eventData.placesClaimed, index : index});
                     eventsToSendToFrond.push(new Event(eventData));
                 }
             }
@@ -397,12 +373,9 @@ exports.modifyEvent = (req, res, next) => {
         if (data == undefined || data.length < 1){
             return funcs.sendError(res, "ID de Event non reconnu");
         }  
-        console.log("here")
         var event = new Event(data[0]);
         
         event.updateEventData(body);
-        console.log(body.event_place)
-        console.log(event)
         funcs.bddQuery(req.conBDA, "UPDATE newEvents SET title=?, description=?, dateEvent=?, dateEvent_end=?, event_place=?, pole_id=?, num_places=?, cost_contributor=?, cost_non_contributor=?, thumbnail = ? WHERE event_id = ?", [event.title , event.description , event.dateEvent , event.dateEvent_end, event.event_place , event.pole_id, event.num_places , event.cost_contributor,  event.cost_non_contributor, body.thumbnail, event.event_id])
         .then(() => funcs.sendSuccess(res, {message : "Evenement modifié !"}))
         .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-2 & 405)", error))
@@ -418,7 +391,6 @@ exports.deleteEvent = (req, res, next) => {
     // On a juste à supprimer l'évènement (pas de place liée)
 
     const body = req.body;
-    console.log(body.event_id)
     funcs.bddQuery(req.conBDA, "DELETE FROM newEvents WHERE event_id = ?", [body.event_id])
     .then(()=> {
         funcs.sendSuccess(res, {message : "Evenement supprimé !"})
