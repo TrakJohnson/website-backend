@@ -119,27 +119,29 @@ var sendMail = function(mailOptions) {
     }
 }
 
-var openBilletterie = function(event_id, con){
-    bddQuery(con, "UPDATE newEvents SET on_sale = 1 WHERE event_id = ?", [event_id])
-    .then(()=> {
-        console.log("Billetterie en vente id : " + event_id)
-        return resolve()
-    })
-    .catch((error)=> {
-        return reject(error)
-    })
-}
+// Pour la V2
 
-var closeBilletterie = function(event_id, con) {
-    bddQuery(con, "UPDATE newEvents SET on_sale = 0 WHERE event_id = ?", [event_id])
-    .then(()=> {
-        console.log("Billetterie en vente id : " + event_id)
-        return resolve()
-    })
-    .catch((error)=> {
-        return reject(error)
-    })
-}
+// var openBilletterie = function(event_id, con){
+//     bddQuery(con, "UPDATE newEvents SET on_sale = 1 WHERE event_id = ?", [event_id])
+//     .then(()=> {
+//         console.log("Billetterie en vente id : " + event_id)
+//         return resolve()
+//     })
+//     .catch((error)=> {
+//         return reject(error)
+//     })
+// }
+
+// var closeBilletterie = function(event_id, con) {
+//     bddQuery(con, "UPDATE newEvents SET on_sale = 0 WHERE event_id = ?", [event_id])
+//     .then(()=> {
+//         console.log("Billetterie en vente id : " + event_id)
+//         return resolve()
+//     })
+//     .catch((error)=> {
+//         return reject(error)
+//     })
+// }
 
 
 

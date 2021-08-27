@@ -27,6 +27,8 @@ conBDA = mysql.createConnection({
 // open the MySQL connection
 conBDA.connect(error => {
   if (error) throw error;
+  console.log("Successfully connected to the BDA's database."); 
+
 });
 
   // Portail one
@@ -65,7 +67,7 @@ app.use(function(req, res,next){
   req.conBDA = conBDA;
   req.conPortail = conPortail;
   // req.transporter = transporter;
-  console.log("database connected")
+  
   next();
 });
 
