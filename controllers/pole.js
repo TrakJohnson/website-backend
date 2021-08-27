@@ -4,14 +4,19 @@ const Pole = require('../models/pole');
 
 exports.getPoles = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT * FROM newPoles")
-    .then((data) => {
+    .then(async (data) => {
         if (data == undefined || data.length < 1) {
             funcs.sendSuccess(res, [])
         } else {
             var polesToSendToFrond = [];
-            data.forEach(poleData => {
-                polesToSendToFrond.push(new Pole(poleData));
-            });
+            const getData = async () => {
+                for (var i = 0; i < data.length; i++) {
+                    var poleData = data[i];
+                    poleData.members = await funcs.bddQuery(req.conBDA, "SELECT * FROM newMembers WHERE pole_id = ?", [poleData.pole_id]);
+                    polesToSendToFrond.push(new Pole(poleData));
+                }
+            }
+            await getData();
             funcs.sendSuccess(res, polesToSendToFrond);
         }
     })

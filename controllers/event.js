@@ -357,6 +357,27 @@ exports.getAllBilletteries = (req, res, next) => {
     .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-0 & 405)", error))
 }
 
+exports.getSomeBilletteries = async (req, res, next) => {
+    var eventsToSendFront = [];
+    const forBoucle = async (IdsEventsToGet) => {
+        IdsEventsToGet.forEach(async id => {
+            await funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE is_billetterie = 1 AND event_id = ?", [id])
+            .then(data => {
+                if (data == undefined || data.length < 1) {
+                    // Rien
+                } else {
+                    console.log({eventSent : data[0].title});
+
+                    eventsToSendFront.push(new Event(data[0]));
+                }
+            })
+            .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-0 & 405)", error))
+        });
+    } 
+    await forBoucle();
+    console.log("hey");
+    funcs.sendSuccess(res, eventsToSendFront);
+}
 
 
 exports.modifyEvent = (req, res, next) => {

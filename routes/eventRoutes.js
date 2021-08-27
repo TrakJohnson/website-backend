@@ -13,6 +13,7 @@ router.get('/getEventsForCalendar', eventCtrl.getEventsForCalendar)
 
 router.get('/getBilletteriesToCome', eventCtrl.getBilletteriesToCome);
 router.get('/getAllBilletteries', eventCtrl.getAllBilletteries);
+router.get('/getSomeBilletteries', eventCtrl.getSomeBilletteries);
 router.post("/closeBilletterie", eventCtrl.closeBilletterie);
 router.post("/reSaleBilletterie", eventCtrl.reSaleBilletterie);
 router.post("/givePlaceToUser", eventCtrl.givePlaceToUser);
