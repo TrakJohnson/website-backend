@@ -119,10 +119,31 @@ var sendMail = function(mailOptions) {
     }
 }
 
+var openBilletterie = function(event_id, con){
+    bddQuery(con, "UPDATE newEvents SET on_sale = 1 WHERE event_id = ?", [event_id])
+    .then(()=> {
+        console.log("Billetterie en vente id : " + event_id)
+        return resolve()
+    })
+    .catch((error)=> {
+        return reject(error)
+    })
+}
+
+var closeBilletterie = function(event_id, con) {
+    bddQuery(con, "UPDATE newEvents SET on_sale = 0 WHERE event_id = ?", [event_id])
+    .then(()=> {
+        console.log("Billetterie en vente id : " + event_id)
+        return resolve()
+    })
+    .catch((error)=> {
+        return reject(error)
+    })
+}
 
 
 
-module.exports = {oneYAgoDate : oneYAgoDate, sendMail : sendMail, bddQuery : bddQuery, hash : hash, sendError: sendError, sendSuccess : sendSuccess, whereIsAccount : whereIsAccount, currentDate : currentDate};
+module.exports = {openBilletterie : openBilletterie, closeBilletterie : closeBilletterie, oneYAgoDate : oneYAgoDate, sendMail : sendMail, bddQuery : bddQuery, hash : hash, sendError: sendError, sendSuccess : sendSuccess, whereIsAccount : whereIsAccount, currentDate : currentDate};
 
 
 

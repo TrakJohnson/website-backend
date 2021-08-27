@@ -2,6 +2,7 @@
 const funcs = require('../functions/functions');
 const Event = require('../models/event');
 const Place = require('../models/place');
+const schedule = require('node-schedule')
 
 const getPlacesClaimedForEvent = async (conBda, event_id) => {
     return await funcs.bddQuery(conBDA, "SELECT * FROM newPlaces WHERE event_id = ?", [event_id])
@@ -100,9 +101,23 @@ exports.getEventsForCalendar = (req, res, next) => {
 exports.createEvent = (req, res, next) => {
     const body = req.body;
     funcs.bddQuery(req.conBDA, "INSERT INTO `newEvents` (`event_id`, `title`, `description`, `dateEvent`, `dateEvent_end`, `event_place`, `pole_id`, `login_creator`, `date_open`, `date_close`, `num_places`, `cost_contributor`, `cost_non_contributor`, `points`, `on_sale`, `thumbnail`, `is_billetterie`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [body.title , body.description , body.dateEvent, body.dateEvent_end, body.event_place , body.pole_id , body.loginSender , body.date_open , body.date_close , body.num_places , body.cost_contributor,  body.cost_non_contributor, body.points, 0 /* Billetterie fermée lors de sa création*/, body.thumbnail, body.is_billetterie])
-    .then(() => funcs.sendSuccess(res, {message : "Evenement créé !"}))
+    .then(() => {
+
+        if (body.is_billetterie){
+            const open_this_billetterie = schedule.scheduleJob(body.date_open, funcs.openBilletterie(body.event_id, body.conBDA));
+            const close_this_billetterie = schedule.scheduleJob(body.date_close, funcs.closeBilletterie(body.event_id, body.conBDA))
+        }
+
+        funcs.sendSuccess(res, {message : "Evenement créé !"})
+
+        
+    })
     .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-1 & 405)", error))
     
+
+
+
+
 }
 
 exports.modifyBilletterie = (req, res, next) => {
