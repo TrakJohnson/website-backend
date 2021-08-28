@@ -20,7 +20,7 @@ exports.getPoles = (req, res, next) => {
                     }
                     console.log({pole: new Pole(poleData)});
                     polesToSendToFrond.push(new Pole(poleData));
-                }j
+                }
             }
             await getData();
             funcs.sendSuccess(res, polesToSendToFrond);

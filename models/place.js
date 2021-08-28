@@ -7,6 +7,8 @@ var Place = class Place {
         this.login = data.login;
         this.status = data.status;
         this.payed = data.payed;
+        this.points = data.points;
+        this.contributor = data.contributor;
     }  
 
     updateEventData(newInfos) {
@@ -15,6 +17,8 @@ var Place = class Place {
         this.login = newInfos.login != undefined ? newInfos.login : this.login;
         this.status = newInfos.status != undefined ? newInfos.status : this.status;
         this.payed = newInfos.payed != undefined ? newInfos.payed : this.payed;
+        this.points = newInfos.points != undefined ? newInfos.points : this.points;
+        this.contributor = newInfos.contributor != undefined ? newInfos.contributor : this.contributor;
     }
 }
 
