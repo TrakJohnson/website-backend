@@ -300,14 +300,17 @@ exports.givePlaceToUser = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT points, num_places FROM newEvents WHERE event_id=?", [req.body.id_billetterie])
     .then(async data => {
         if (data != undefined && data.length > 0) {
-            const pointsToAdd = infos.points, numPlaces = infos.num_places;
+            console.log({data : data})
+            const pointsToAdd = data[0].points, numPlaces = data[0].num_places;
             funcs.bddQuery(req.conBDA, "SELECT COUNT(*) FROM newPlaces WHERE event_id=? AND status=1", [req.body.id_billetterie])
-            .then(async data => {
-                const numPlacesAttributed = data[0];
+            .then(async data2 => {
+                console.log({data2 : data2})
+                const numPlacesAttributed = data2[0]["COUNT(*)"];
 
+                console.log({numPmacesAtt : numPlacesAttributed, numPlaces : numPlaces});
                 if (numPlacesAttributed < numPlaces) {
-                    await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=1 WHERE event_id=? AND login=?", [req.body.id_billetterie, req.loginToGivePlace]);
-                    await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points+? WHERE login=?", [pointsToAdd, req.loginToGivePlace]);
+                    await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=1 WHERE event_id=? AND login=?", [req.body.id_billetterie, req.body.loginToGivePlace]);
+                    await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points+? WHERE login=?", [pointsToAdd, req.body.loginToGivePlace]);
                 }
             })
         } else {
@@ -321,10 +324,11 @@ exports.retirePlaceToUser = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT points FROM newEvents WHERE event_id=?", [req.body.id_billetterie])
     .then(async data => {
         if (data != undefined && data.length > 0) {
-            const pointsToAdd = infos.points;
-            await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=0 WHERE event_id=? AND login", [req.body.id_billetterie, req.loginToRetirePlace]);
-            await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points-? WHERE login=?", [pointsToAdd, req.loginToRetirePlace]);
-        } else {
+            console.log({daat3 : data});
+            const pointsToAdd = data[0].points;
+            await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=0 WHERE event_id=? AND login=?", [req.body.id_billetterie, req.body.loginToRetirePlace]);
+            await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points-? WHERE login=?", [pointsToAdd, req.body.loginToRetirePlace]);
+        } else {    
             funcs.sendError(res, "Erreur, ID de billetterie non reconnue");
         }
     })
