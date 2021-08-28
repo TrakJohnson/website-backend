@@ -1,6 +1,6 @@
 const funcs = require('../functions/functions');
 const jwt = require('jsonwebtoken');
-const { currentDate, sendError } = require('../functions/functions');
+const { currentDate } = require('../functions/functions');
 const Account = require('../models/account');
 const Place = require('../models/place');
 
@@ -107,7 +107,7 @@ exports.claimePlace = (req, res, next) => {
                     funcs.sendSuccess(res, {message : "Demande enregistrée"});
                 } else {
                     // Pas de place à ce nom, on en crée donc une
-                    funcs.bddQuery(req.conBDA, "INSERT INTO newPlaces (event_id, login, status, payed) VALUES (?, ?, ?, ?)", [req.body.id_billetterie, req.body.login, -1 /* Place non attribuée au début a priori comme l'évènement est en vente */, 0 /* Place non payée a priori */])
+                    funcs.bddQuery(req.conBDA, "INSERT INTO newPlaces (event_id, login, size, status, payed) VALUES (?, ?, ?, ?, ?)", [req.body.id_billetterie, req.body.login,  req.body.size, -1 /* Place non attribuée au début a priori comme l'évènement est en vente */, 0 /* Place non payée a priori */])
                     .then(() => funcs.sendSuccess(res, {message : "Demande enregistrée"}))
                     .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);});
                 }

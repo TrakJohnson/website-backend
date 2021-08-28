@@ -5,6 +5,7 @@ var Place = class Place {
         this.place_id = data.place_id;
         this.event_id = data.event_id;
         this.login = data.login;
+        this.size = data.size;
         this.status = data.status;
         this.payed = data.payed;
         this.points = data.points;
@@ -15,6 +16,7 @@ var Place = class Place {
         this.place_id = newInfos.place_id != undefined ? newInfos.place_id : this.place_id;
         this.event_id = newInfos.event_id != undefined ? newInfos.event_id : this.event_id;
         this.login = newInfos.login != undefined ? newInfos.login : this.login;
+        this.size = newInfos.size != undefined ? newInfos.size : this.size;
         this.status = newInfos.status != undefined ? newInfos.status : this.status;
         this.payed = newInfos.payed != undefined ? newInfos.payed : this.payed;
         this.points = newInfos.points != undefined ? newInfos.points : this.points;
