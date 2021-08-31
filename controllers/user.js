@@ -223,7 +223,6 @@ exports.createDemandVerification = (req, res, next) => {
 
 exports.SendVerificationEmail  = (req, res, next) => {
 
-    // Email for verification of address mail
 
     email1Options = {
         from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
