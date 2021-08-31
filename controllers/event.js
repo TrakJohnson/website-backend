@@ -214,7 +214,7 @@ exports.deleteBilletterie = (req, res, next) => {
                 from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
                 to: emails, // list of receivers
                 subject: "[BDA] Suppression d'une de vos billetteries", // Subject line
-                html : "<p> Bonjour, </p> <p> Une billetterie te concernant vient d'être supprimé, n'hésite pas à consulter le <a href = 'http://localhost:4200'> portail BDA </a> pour plus d'informations. (code suppression :" + body.event_id + ")."
+                html : "<p> Bonjour, </p> <p> Une billetterie te concernant vient d'être supprimé, n'hésite pas à consulter le <a href = 'http://bda-mines.alwaysdata.net/' > portail BDA </a> pour plus d'informations. (code suppression :" + body.event_id + ")."
             }
             
             funcs.sendSuccess(res, {message : "Evenement supprimé !"})

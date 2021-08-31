@@ -229,7 +229,7 @@ exports.SendVerificationEmail  = (req, res, next) => {
         from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
         to: req.body.email, // list of receivers
         subject: "[BDA] Verification adresse mail", // Subject line
-        html : "<p> Bonjour, </p> <p> tu as créé un compte avec cet email sur le site du BDA des Mines Paristech, si cela n'est pas le cas, contacte les administrateurs ou répond à cet email. <br> Pour vérifier cet email, clique sur ce lien : <br> 'http://localhost:4200/register/verify-email/" + req.body.hash + " </p>"
+        html : "<p> Bonjour, </p> <p> tu as créé un compte avec cet email sur le site du BDA des Mines Paristech, si cela n'est pas le cas, contacte les administrateurs ou répond à cet email. <br> Pour vérifier cet email, clique sur ce lien : <br> 'http://bda-mines.alwaysdata.net/register/verify-email/" + req.body.hash + " </p>"
     }
 
     // Email with connection IDs (login & password)
