@@ -5,7 +5,7 @@ const Place = require('../models/place');
 const schedule = require('node-schedule')
 
 const getPlacesClaimedForEvent = async (conBda, event_id) => {
-    return await funcs.bddQuery(conBDA, "SELECT * FROM newPlaces WHERE event_id = ?", [event_id])
+    return await funcs.bddQuery(conBDA, "SELECT * FROM newPlaces JOIN newUsers ON newPlaces.login = newUsers.login WHERE event_id = ?", [event_id])
     .then(async data => {
         var placesClaimed = [];
         if (data && data.length > 0) {
@@ -89,15 +89,6 @@ exports.getEventsForCalendar = (req, res, next) => {
 
 }
 
-
-
-
-
-
-
-
-
-
 exports.createEvent = (req, res, next) => {
     const body = req.body;
     funcs.bddQuery(req.conBDA, "INSERT INTO `newEvents` (`event_id`, `title`, `description`, `dateEvent`, `dateEvent_end`, `event_place`, `pole_id`, `login_creator`, `date_open`, `date_close`, `num_places`, `cost_contributor`, `cost_non_contributor`, `points`, `on_sale`, `thumbnail`, `is_billetterie`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [body.title , body.description , body.dateEvent, body.dateEvent_end, body.event_place , body.pole_id , body.loginSender , body.date_open , body.date_close , body.num_places , body.cost_contributor,  body.cost_non_contributor, body.points, 0 /* Billetterie fermée lors de sa création*/, body.thumbnail, body.is_billetterie])
@@ -115,11 +106,6 @@ exports.createEvent = (req, res, next) => {
         
     })
     .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-1 & 405)", error))
-    
-
-
-
-
 }
 
 exports.modifyBilletterie = (req, res, next) => {
@@ -207,33 +193,31 @@ exports.deleteBilletterie = (req, res, next) => {
 
         //on récupère également le mail du créateur
         funcs.bddQuery(req.conBDA, "SELECT newUsers.email FROM newUsers JOIN newEvents ON newUsers.login = newEvents.login_creator WHERE newEvents.event_id = ?", [req.body.event_id])
-        .then((data) => {
+        .then(async (data) => {
 
             mail_list.push(data[0].email)
             
             emails = mail_list.toString()
-            // Ensuite on supprime les places relatives à cet évènement
-            funcs.bddQuery(req.conBDA, "DELETE FROM newPlaces WHERE event_id = ?", [body.event_id])
-            .then(() => {
-                // Enfin on supprime l'évènement en lui même
-                funcs.bddQuery(req.conBDA, "DELETE FROM newEvents WHERE event_id = ?", [body.event_id])
-                .then(() => {
-
-                    emailOptions = {
-                        from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
-                        to: emails, // list of receivers
-                        subject: "[BDA] Suppression d'une de vos billetteries", // Subject line
-                        html : "<p> Bonjour, </p> <p> Une billetterie te concernant vient d'être supprimé, n'hésite pas à consulter le <a href = 'http://localhost:4200'> portail BDA </a> pour plus d'informations. (code suppression :" + body.event_id + ")."
+            // Ensuite on supprime les places relatives à cet évènement, on enlève les points si besoin
+            await funcs.bddQuery(req.conBDA, "SELECT * FROM newPlaces WHERE event_id=? AND status=1", [req.body.id_billetterie])
+                .then(async data => {
+                    for (var i = 0; i < data.length; i++) {
+                        await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points-?-?+1 WHERE login=?", [pointsToAdd, data[i].size, data[i].login]);
                     }
-                    
-                    funcs.sendSuccess(res, {message : "Evenement supprimé !"})
-                    
-                    
                 })
-                .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-4 & 405)", error))
-            })
-            .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-4 & 405)", error))
+                .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error));
+            await funcs.bddQuery(req.conBDA, "DELETE FROM newPlaces WHERE event_id = ?", [body.event_id])
+            // Enfin on supprime l'évènement en lui même
+            await funcs.bddQuery(req.conBDA, "DELETE FROM newEvents WHERE event_id = ?", [body.event_id])
 
+            emailOptions = {
+                from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
+                to: emails, // list of receivers
+                subject: "[BDA] Suppression d'une de vos billetteries", // Subject line
+                html : "<p> Bonjour, </p> <p> Une billetterie te concernant vient d'être supprimé, n'hésite pas à consulter le <a href = 'http://localhost:4200'> portail BDA </a> pour plus d'informations. (code suppression :" + body.event_id + ")."
+            }
+            
+            funcs.sendSuccess(res, {message : "Evenement supprimé !"})
         })
         .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error))
 
@@ -253,7 +237,7 @@ exports.closeBilletterie = (req, res, next) => {
                 .then(async data => {
                     for (var i = 0; i < Math.min(numPlaces, data.length); i++) {
                         await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=1 WHERE event_id=? AND login=?", [req.body.id_billetterie, data[i].login]);
-                        await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points+? WHERE login=?", [pointsToAdd, data[i].login]);
+                        await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points+?+(SELECT size FROM newPlaces WHERE login=? AND event_id=?)-1 WHERE login=?", [pointsToAdd, data[i].login, req.body.id_billetterie, data[i].login]);
                     }
                     await funcs.bddQuery(req.conBDA, "UPDATE newEvents SET on_sale=0 WHERE event_id=?", [req.body.id_billetterie]);
                     funcs.sendSuccess(res, {message : "Evenement retiré de la vente avec succès !"})
@@ -276,10 +260,10 @@ exports.reSaleBilletterie = (req, res, next) => {
             const infos = data[0];
             const pointsToAdd = infos.points, onSale = infos.onSale;
             if (!onSale) {
-                funcs.bddQuery(req.conBDA, "SELECT * FROM newPlaces WHERE event_id=? && status=1", [req.body.id_billetterie])
+                funcs.bddQuery(req.conBDA, "SELECT * FROM newPlaces WHERE event_id=? AND status=1", [req.body.id_billetterie])
                 .then(async data => {
                     for (var i = 0; i < data.length; i++) {
-                        await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points-? WHERE login=?", [pointsToAdd, data[i].login]);
+                            await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points-?-?+1 WHERE login=?", [pointsToAdd, data[i].size, data[i].login]);
                     }
                     await funcs.bddQuery(req.conBDA, "UPDATE newEvents SET on_sale=1 WHERE event_id=?", [req.body.id_billetterie]);
                     await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=-1 WHERE event_id=?", [req.body.id_billetterie]);
@@ -300,14 +284,17 @@ exports.givePlaceToUser = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT points, num_places FROM newEvents WHERE event_id=?", [req.body.id_billetterie])
     .then(async data => {
         if (data != undefined && data.length > 0) {
-            const pointsToAdd = infos.points, numPlaces = infos.num_places;
+            console.log({data : data})
+            const pointsToAdd = data[0].points, numPlaces = data[0].num_places;
             funcs.bddQuery(req.conBDA, "SELECT COUNT(*) FROM newPlaces WHERE event_id=? AND status=1", [req.body.id_billetterie])
-            .then(async data => {
-                const numPlacesAttributed = data[0];
+            .then(async data2 => {
+                console.log({data2 : data2})
+                const numPlacesAttributed = data2[0]["COUNT(*)"];
 
+                console.log({numPmacesAtt : numPlacesAttributed, numPlaces : numPlaces});
                 if (numPlacesAttributed < numPlaces) {
-                    await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=1 WHERE event_id=? AND login=?", [req.body.id_billetterie, req.loginToGivePlace]);
-                    await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points+? WHERE login=?", [pointsToAdd, req.loginToGivePlace]);
+                    await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=1 WHERE event_id=? AND login=?", [req.body.id_billetterie, req.body.loginToGivePlace]);
+                    await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points+?+(SELECT size FROM newPlaces WHERE login=? AND event_id=?)-1 WHERE login=?", [pointsToAdd, req.body.loginToGivePlace, req.body.id_billetterie, req.body.loginToGivePlace]);
                 }
             })
         } else {
@@ -321,10 +308,11 @@ exports.retirePlaceToUser = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT points FROM newEvents WHERE event_id=?", [req.body.id_billetterie])
     .then(async data => {
         if (data != undefined && data.length > 0) {
-            const pointsToAdd = infos.points;
-            await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=0 WHERE event_id=? AND login", [req.body.id_billetterie, req.loginToRetirePlace]);
-            await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points-? WHERE login=?", [pointsToAdd, req.loginToRetirePlace]);
-        } else {
+            console.log({daat3 : data});
+            const pointsToAdd = data[0].points;
+            await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=0 WHERE event_id=? AND login=?", [req.body.id_billetterie, req.body.loginToRetirePlace]);
+            await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points-?-(SELECT size FROM newPlaces WHERE login=? AND event_id=?)+1 WHERE login=?", [pointsToAdd, req.body.loginToRetirePlace, req.body.id_billetterie, req.body.loginToRetirePlace]);
+        } else {    
             funcs.sendError(res, "Erreur, ID de billetterie non reconnue");
         }
     })
