@@ -159,7 +159,7 @@ exports.modifyBilletterie = (req, res, next) => {
                         from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
                         to: emails, // list of receivers
                         subject: "[BDA] Modification d'une de vos billetteries", // Subject line
-                        html : "<p> Bonjour, </p> <p> Une billetterie te concernant vient d'être modifiée, n'hésite pas à consulter le <a href = 'http://localhost:4200'> portail BDA </a> pour plus d'informations. (code modification :" + body.event_id + ")."
+                        html : "<p> Bonjour, </p> <p> Une billetterie te concernant vient d'être modifiée, n'hésite pas à consulter le <a href = 'http://bda-mines.alwaysdata.net/events/display/" + body.event_id + "'> portail BDA </a> pour plus d'informations. (code modification :" + body.event_id + ")."
                     }
 
                     funcs.sendMail(emailOptions);
