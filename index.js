@@ -67,7 +67,6 @@ app.use(function(req, res,next){
   req.conBDA = conBDA;
   req.conPortail = conPortail;
   // req.transporter = transporter;
-  console.log({laal : req.url});
   next();
 });
 

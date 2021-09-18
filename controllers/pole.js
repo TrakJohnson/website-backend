@@ -16,9 +16,7 @@ exports.getPoles = (req, res, next) => {
                     poleData.members = await funcs.bddQuery(req.conBDA, "SELECT * FROM newMembers JOIN newUsers ON newMembers.login = newUsers.login WHERE pole_id = ?", [poleData.pole_id]);
                     for (var j = 0; j < poleData.members.length; j++) {
                         poleData.members[j] = new Member(poleData.members[j]);
-                        console.log({member : poleData.members[j] });
                     }
-                    console.log({pole: new Pole(poleData)});
                     polesToSendToFrond.push(new Pole(poleData));
                 }
             }
