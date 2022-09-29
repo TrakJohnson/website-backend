@@ -31,14 +31,16 @@ exports.sendRecoverMail = (req, res, next) => {
         from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
         to: req.body.emailAdressToSend, // list of receivers
         subject: "[BDA] Changement de mot de passe", // Subject line
-        html : "<p> Bonjour, </p> <p> tu as demandé à changer ton mot de passe sur le site du BDA, si cela n'est pas le cas, contacte les administrateurs. <br> Pour changer ton mot de passe, clique sur ce lien : <br> http://localhost:4200/recover/change-password/" + req.body.token + "<br> Attention : ce lien n'est valable que 24h. </p>"
+        html : "<p> Bonjour,</p> " +"<p>Tu as demandé à changer ton mot de passe sur le site du BDA, si cela n'est pas le cas, contacte les administrateurs. <br> Pour changer ton mot de passe, clique sur ce lien : <br> http://bda-mines.alwaysdata.net/recover/change-password/" + req.body.token + "<br> Attention : ce lien n'est valable que 24h. </p>"
     }
 
     funcs.sendMail(emailOptions)
     .then((result) => {
-        funcs.sendSuccess(res, {message : "Un mail a été envoyé, merci de consulter votre boitre mail."})
+        funcs.sendSuccess(res, {message : "Un mail a été envoyé, merci de consulter votre boîte mail."})
     })
     .catch((err) => {
+        console.log("Erreur lors de l'envoi du msg de récupération")
+        console.log(err)
         return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 302 & 412)", error)
     })
 };

@@ -11,6 +11,7 @@ exports.login = (req, res, next) => {
         if (data0 != undefined & data0.length > 0) {
             // Gather true password's infos
             const truePwdInfos = data0[0].password;
+	    console.log({"hashed password" :req.body.password});
             if (truePwdInfos == req.body.password) {
                 // Update last connection date of this user
                 funcs.bddQuery(req.conBDA, 'UPDATE newUsers SET date_last_con = ? WHERE login = ?', [currentDate(), req.body.login])
@@ -170,43 +171,36 @@ exports.createAccount = (req, res, next) => {
 
 exports.modifyAccount = (req, res, next) => {
     const body = req.body;
-    funcs.bddQuery(req.conBDA, "SELECT * FROM newUsers WHERE login = ?", [body.login])
+    if (body.token && body.prenom && body.nom && body.email && body.password && body.promotion) {
+        return funcs.sendError(res, "Il manque des informations pour modifier le compte !");
+    }
+    var old_email;
+    funcs.bddQuery(req.conBDA, "SELECT email FROM newUsers WHERE login = ?", [body.login])
     .then((data)=> {
-        if (data && data.length > 0) {
-            const oldAccount = new Account(data[0]);
-            const newAccount = Account.updateAccountData(oldAccount, body.newInfos);
-            funcs.bddQuery(req.conBDA, "UPDATE newUsers SET prenom = ?, nom = ?, email = ?, email_verified = ?, password = ?, admin = ?, contributor = ?, promo = ? WHERE login = ?", [newAccount.prenom, newAccount.nom, newAccount.email, newAccount.email_verified, body.password ? body.password : data[0].password, newAccount.admin, newAccount.contributor, newAccount.promo, body.login])
-            .then(()=> {
-                if (body.sendEmail) { // If sendEmail
-                    emailOptions = {
-                        from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
-                        to: old_email, // list of receivers
-                        subject: "[BDA] Modification des informations du compte", // Subject line
-                        html : "<p> Bonjour, </p> <p> les informations de ton compte viennent d'être changées sur le portail BDA, si cela n'est pas le cas, contacte un administrateur.</p>"
-                    }
-                    funcs.sendMail(emailOptions)
-                    .then((result) => {
-                        funcs.sendSuccess(res, {message : "Modifications enregistrées"})
-                    })
-                    .catch((err) => {
-                        return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", err)
-                    })
-                } else {
-                    funcs.sendSuccess(res, {message : "Modifications enregistrées"})
-                }
-               
+        old_email = data[0].email;
+        funcs.bddQuery(req.conBDA, "UPDATE newUsers SET prenom=?, nom=?, email=?, promo=?, password=? WHERE login = ?", [body.prenom, body.nom, body.email, body.promo, body.password, body.login])
+        .then(()=> {
+            emailOptions = {
+                from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
+                to: old_email, // list of receivers
+                subject: "[BDA] Modification des informations du compte", // Subject line
+                html : "<p> Bonjour, </p> <p> les informations de ton compte viennent d'être changées sur le portail BDA, si cela n'est pas le cas, contacte un administrateur.</p>"
+            }
+            funcs.sendMail(emailOptions)
+            .then((result) => {
+                funcs.sendSuccess(res, {message : "Modifications enregistrées"})
             })
             .catch((err) => {
-                console.log({err : err})
                 return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", err)
             })
-        } else {
-            console.log(body.login)
-            return funcs.sendError(res, "Erreur, le compte n'a pas été trouvé !");
-        }
+        })
+        .catch((err) => {
+            
+            return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", err)
+        })
+
     })
     .catch(error => {
-        console.log({error : error})
         return funcs.sendError(res, "Erreur, merci de contacter un administrateur !");
 
     })

@@ -19,6 +19,7 @@ const getPlacesClaimedForEvent = async (conBda, event_id) => {
 exports.getOneEvent = (req, res, next) =>{
     funcs.bddQuery(req.conBDA, "SELECT * FROM newEvents WHERE event_id = ?", [req.query.event_id])
     .then(async (data) => {
+        console.log(data)
         if (data == undefined || data.length <1) {
             funcs.sendError(res, "Pas d'évènement avec cet id", data)
         } else {
@@ -235,16 +236,9 @@ exports.closeBilletterie = (req, res, next) => {
                 await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=0 WHERE event_id=?", [req.body.id_billetterie]);
                 funcs.bddQuery(req.conBDA, "SELECT * FROM newUsers JOIN newPlaces ON newUsers.login = newPlaces.login WHERE event_id=? ORDER BY contributor DESC, points, place_ID", [req.body.id_billetterie])
                 .then(async data => {
-                    var placesAttributed = 0
                     for (var i = 0; i < Math.min(numPlaces, data.length); i++) {
-                        const size = (await funcs.bddQuery(req.conBDA, "SELECT size FROM newPlaces WHERE login=? AND event_id=?", [data[i].login, req.body.id_billetterie]))[0].size;
-                        console.log({size : size});
-                        if ((placesAttributed + size) <= numPlaces) { // Si l'attribution ne fait pas dépasser le quota total
-                            placesAttributed += size
-                            console.log({placesAttributed : placesAttributed, numPlaces : numPlaces});
-                            await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=1 WHERE event_id=? AND login=?", [req.body.id_billetterie, data[i].login]);
-                            await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points+?+?-1 WHERE login=?", [pointsToAdd, size, data[i].login]);
-                        }
+                        await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=1 WHERE event_id=? AND login=?", [req.body.id_billetterie, data[i].login]);
+                        await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points+?+(SELECT size FROM newPlaces WHERE login=? AND event_id=?)-1 WHERE login=?", [pointsToAdd, data[i].login, req.body.id_billetterie, data[i].login]);
                     }
                     await funcs.bddQuery(req.conBDA, "UPDATE newEvents SET on_sale=0 WHERE event_id=?", [req.body.id_billetterie]);
                     funcs.sendSuccess(res, {message : "Evenement retiré de la vente avec succès !"})
@@ -291,11 +285,14 @@ exports.givePlaceToUser = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT points, num_places FROM newEvents WHERE event_id=?", [req.body.id_billetterie])
     .then(async data => {
         if (data != undefined && data.length > 0) {
+            console.log({data : data})
             const pointsToAdd = data[0].points, numPlaces = data[0].num_places;
             funcs.bddQuery(req.conBDA, "SELECT COUNT(*) FROM newPlaces WHERE event_id=? AND status=1", [req.body.id_billetterie])
             .then(async data2 => {
+                console.log({data2 : data2})
                 const numPlacesAttributed = data2[0]["COUNT(*)"];
 
+                console.log({numPmacesAtt : numPlacesAttributed, numPlaces : numPlaces});
                 if (numPlacesAttributed < numPlaces) {
                     await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=1 WHERE event_id=? AND login=?", [req.body.id_billetterie, req.body.loginToGivePlace]);
                     await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points+?+(SELECT size FROM newPlaces WHERE login=? AND event_id=?)-1 WHERE login=?", [pointsToAdd, req.body.loginToGivePlace, req.body.id_billetterie, req.body.loginToGivePlace]);
@@ -312,6 +309,7 @@ exports.retirePlaceToUser = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT points FROM newEvents WHERE event_id=?", [req.body.id_billetterie])
     .then(async data => {
         if (data != undefined && data.length > 0) {
+            console.log({daat3 : data});
             const pointsToAdd = data[0].points;
             await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=0 WHERE event_id=? AND login=?", [req.body.id_billetterie, req.body.loginToRetirePlace]);
             await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points-?-(SELECT size FROM newPlaces WHERE login=? AND event_id=?)+1 WHERE login=?", [pointsToAdd, req.body.loginToRetirePlace, req.body.id_billetterie, req.body.loginToRetirePlace]);
@@ -374,6 +372,7 @@ exports.getSomeBilletteries = async (req, res, next) => {
                 if (data == undefined || data.length < 1) {
                     // Rien
                 } else {
+                    console.log({eventSent : data[0].title});
 
                     eventsToSendFront.push(new Event(data[0]));
                 }
@@ -382,6 +381,7 @@ exports.getSomeBilletteries = async (req, res, next) => {
         });
     } 
     await forBoucle();
+    console.log("hey");
     funcs.sendSuccess(res, eventsToSendFront);
 }
 

@@ -17,22 +17,20 @@ var Account = class Account {
         this.last_token = data.last_token
     }  
 
-    static updateAccountData(oldAccount, newInfos) {
-        var newAccount = new Account({});
-        newAccount.prenom = newInfos.prenom ? newInfos.prenom : oldAccount.prenom;
-        newAccount.nom = newInfos.nom ? newInfos.nom : oldAccount.nom;
-        newAccount.login = newInfos.login ? newInfos.login : oldAccount.login;
-        newAccount.email = newInfos.emai ? newInfos.email : oldAccount.email;
-        newAccount.email_verified = newInfos.email_verified ? newInfos.email_verified : oldAccount.email_verified;
-        newAccount.contributor = newInfos.contributor ? newInfos.contributor : oldAccount.contributor;
-        newAccount.admin = newInfos.admin ? newInfos.admin : oldAccount.admin;
-        newAccount.points = newInfos.points ? newInfos.points : oldAccount.points;
-        newAccount.date_creation = newInfos.date_creation ? newInfos.date_creation : oldAccount.date_creation;
-        newAccount.date_last_con = newInfos.date_last_con ? newInfos.date_last_con : oldAccount.date_last_con;
-        newAccount.promo = newInfos.promo ? newInfos.promo : oldAccount.promo;
-        newAccount.placesClaimed = newInfos.placesClaimed ? newInfos.placesClaimed : oldAccount.placesClaimed;
-        newAccount.last_token = newInfos.last_token ? newInfos.last_token : oldAccount.last_token;
-        return newAccount;
+    static updateAccountData(newInfos) {
+        this.prenom = newInfos.prenom != undefined ? newInfos.prenom : this.prenom;
+        this.nom = newInfos.nom != undefined ? newInfos.nom : this.nom;
+        this.login = newInfos.login != undefined ? newInfos.login : this.login;
+        this.email = newInfos.emai != undefinedl ? newInfos.email : this.email;
+        this.email_verified = newInfos.email_verified != undefined ? newInfos.email_verified : this.email_verified;
+        this.contributor = newInfos.contributor != undefined ? newInfos.contributor : this.contributor;
+        this.admin = newInfos.admin != undefined ? newInfos.admin : this.admin;
+        this.points = newInfos.points != undefined ? newInfos.points : this.points;
+        this.date_creation = newInfos.date_creation != undefined ? newInfos.date_creation : this.date_creation;
+        this.date_last_con = newInfos.date_last_con != undefined ? newInfos.date_last_con : this.date_last_con;
+        this.promo = newInfos.promo != undefined ? newInfos.promo : this.promo;
+        this.placesClaimed = newInfos.placesClaimed != undefined ? newInfos.placesClaimed : this.placesClaimed;
+        this.last_token = newInfos.last_token != undefined ? newInfos.last_token : this.last_token;
     }
 }
 

@@ -2,8 +2,10 @@ var express = require('express');
 const mysql = require('mysql');
 const nodemailer = require('nodemailer');
 var smtpTransport = require('nodemailer-smtp-transport');
-
 const {google} = require('googleapis');
+
+// imports .env + environment variables
+require('dotenv').config()
 
 // Routes imports
 const userRoutes = require('./routes/userRoutes');
@@ -16,33 +18,32 @@ const contactRoutes = require('./routes/contactRoutes')
 
 // BDD connection
 
-  // BDA One
+// BDA One
 conBDA = mysql.createConnection({
-  host: "mysql-bda-mines.alwaysdata.net",
-  user: "bda-mines",
-  password: "minesdavis",
-  database: "53700_bda"
+    host: "mysql-bda-mines.alwaysdata.net",
+    user: "bda-mines",
+    password: "minesdavis",
+    database: "53700_bda"
 });
 
 // open the MySQL connection
 conBDA.connect(error => {
-  if (error) throw error;
-  console.log("Successfully connected to the BDA's database."); 
-
+    if (error) throw error;
+    console.log("Successfully connected to the BDA's database.");
 });
 
-  // Portail one
+// Portail one
 
 conPortail = mysql.createConnection({
-  host: "Ns37866.ip-91-121-8.eu",
-  user: "bda",
-  password: "m0ANsNwopInXDunZ",
-  database: "portail"
+    host: "Ns37866.ip-91-121-8.eu",
+    user: "bda",
+    password: "m0ANsNwopInXDunZ",
+    database: "portail"
 });
 
 // open the MySQL connection
 conPortail.connect(error => {
-  if (error) throw error;
+    if (error) throw error;
 });
 
 
@@ -63,18 +64,19 @@ app.listen(4000, function () {
 });
 
 app.use(express.json({limit: '8mb'}));
-app.use(function(req, res,next){
-  req.conBDA = conBDA;
-  req.conPortail = conPortail;
-  // req.transporter = transporter;
-  next();
+app.use(function (req, res, next) {
+    req.conBDA = conBDA;
+    req.conPortail = conPortail;
+    // req.transporter = transporter;
+    console.log({laal: req.url});
+    next();
 });
 
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  next();
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    next();
 });
 
 app.use('/api/user', userRoutes);

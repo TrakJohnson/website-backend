@@ -7,6 +7,8 @@ var Pole = class Pole {
         this.description = data.description;
         this.color = data.color;
         this.members = data.members;
+        this.hasBilletterie = !!data.hasBilletterie;
+        console.log(this.name + ' ' + this.hasBilletterie)
     }  
 
     static updatePoleData(newInfos) {
@@ -15,6 +17,7 @@ var Pole = class Pole {
         this.description = newInfos.description != undefined ? newInfos.description : this.description;
         this.color = newInfos.color != undefined ? newInfos.color : this.color;
         this.members = newInfos.members != undefined ? newInfos.members : this.members;
+        this.hasBilletterie = newInfos.hasBilletterie != undefined ? newInfos.hasBilletterie : this.hasBilletterie;
     }
 }
 
