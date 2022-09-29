@@ -31,7 +31,12 @@ exports.sendRecoverMail = (req, res, next) => {
         from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
         to: req.body.emailAdressToSend, // list of receivers
         subject: "[BDA] Changement de mot de passe", // Subject line
-        html : "<p> Bonjour,</p> " +"<p>Tu as demandé à changer ton mot de passe sur le site du BDA, si cela n'est pas le cas, contacte les administrateurs. <br> Pour changer ton mot de passe, clique sur ce lien : <br> http://bda-mines.alwaysdata.net/recover/change-password/" + req.body.token + "<br> Attention : ce lien n'est valable que 24h. </p>"
+        html : `
+            <p> Bonjour,</p> 
+            <p>Tu as demandé à changer ton mot de passe sur le site du BDA, si cela n'est pas le cas, contacte les administrateurs. 
+            <br>Pour changer ton mot de passe, clique sur ce lien : 
+            <br><br> https://bda-minesparis.fr/recover/change-password/${req.body.token}
+            <br><br> <i>Attention : ce lien n'est valable que 24h.</i> </p>`
     }
 
     funcs.sendMail(emailOptions)
