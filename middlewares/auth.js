@@ -18,6 +18,8 @@ exports.authToken = (req,res,next) => {
 
 exports.findLoginInToken = (req, res, next) => {
     const token = req.body.token;
+    console.log("Token:")
+    console.log(token)
     const now = new Date().getTime() / 1000;
     try {
         const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET')
@@ -29,6 +31,8 @@ exports.findLoginInToken = (req, res, next) => {
             return funcs.sendError(res, "Token expiré !");
         }
     } catch(err) {
+        console.log("Erreur de token:")
+        console.log(err)
         return funcs.sendError(res, "Token error", err);
     }
 }

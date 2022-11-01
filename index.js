@@ -1,13 +1,14 @@
-var express = require('express');
+const express = require('express');
 const mysql = require('mysql');
-const nodemailer = require('nodemailer');
-var smtpTransport = require('nodemailer-smtp-transport');
-const {google} = require('googleapis');
+const path = require('path');
 
 // imports .env + environment variables
-require('dotenv').config()
+// access variables through process.env["KEY"]
+require('dotenv').config({path: path.resolve(__dirname, '.env')})
 
-// Routes imports
+
+// --- Routes imports
+
 const userRoutes = require('./routes/userRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const teamRoutes = require('./routes/teamRoutes');
@@ -16,52 +17,40 @@ const recoverRoutes = require('./routes/recoverRoutes')
 const contactRoutes = require('./routes/contactRoutes')
 
 
-// BDD connection
+// --- SQL connections
 
-// BDA One
+// BDA
 conBDA = mysql.createConnection({
     host: "mysql-bda-mines.alwaysdata.net",
-    user: "bda-mines",
-    password: "minesdavis",
+    user: process.env["SQL_BDA_USER"],
+    password: process.env["SQL_BDA_PASS"],
     database: "53700_bda"
 });
-
-// open the MySQL connection
 conBDA.connect(error => {
-    if (error) throw error;
+    if (error) {
+        console.log("Erreur de connection a la DB BDA")
+        throw error;
+    }
     console.log("Successfully connected to the BDA's database.");
 });
 
-// Portail one
-
+// Portail
 conPortail = mysql.createConnection({
     host: "Ns37866.ip-91-121-8.eu",
-    user: "bda",
-    password: "m0ANsNwopInXDunZ",
+    user: process.env["SQL_PORTAIL_USER"],
+    password: process.env["SQL_PORTAIL_PASS"],
     database: "portail"
 });
-
-// open the MySQL connection
 conPortail.connect(error => {
     if (error) throw error;
 });
 
 
-//old way to post mail without google API, just in case
-
-// let transporter = nodemailer.createTransport(smtpTransport({
-//   service: 'gmail',
-//   host: 'smtp.gmail.com',
-//   auth: {
-//       user: 'bda.rsi.minesparis@gmail.com',
-//       pass: 'del5D8IKL0zU'
-//   }
-// }));
+// --- start express app
 
 const app = express();
 
-app.listen(4000, function () {
-});
+app.listen(4000, function () {});
 
 app.use(express.json({limit: '8mb'}));
 app.use(function (req, res, next) {

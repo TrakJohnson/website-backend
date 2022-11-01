@@ -20,6 +20,7 @@ router.post("/givePlaceToUser", eventCtrl.givePlaceToUser);
 router.post("/retirePlaceToUser", eventCtrl.retirePlaceToUser);
 router.post('/modifyBilletterie', eventCtrl.modifyBilletterie);
 router.post('/deleteBilletterie', eventCtrl.deleteBilletterie);
+router.post('/getEmailsBilletterie', eventCtrl.getEmailsBilletterie)
 
 // Management des events hors billetterie (pas de places à gérer) is_billetterie = 0
 router.post('/createEvent', eventCtrl.createEvent);
