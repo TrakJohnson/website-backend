@@ -430,8 +430,12 @@ exports.deleteEvent = (req, res, next) => {
 
 exports.getEmailsBilletterie = (req, res, next) => {
     const body = req.body;
-    funcs.bddQuery(req.conBDA, "SELECT * FROM newUsers WHERE login IN ?", [[body.logins]])
-        .then((data) => funcs.sendSuccess(res, data))
+    if (body.logins.length == 0) {
+	funcs.sendSuccess(res, [])
+    } else {
+	funcs.bddQuery(req.conBDA, "SELECT * FROM newUsers WHERE login IN ?", [[body.logins]])
+            .then((data) => funcs.sendSuccess(res, data))
+    }
 }
 
 /*
