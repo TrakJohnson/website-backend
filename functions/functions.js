@@ -3,7 +3,11 @@ const {google} = require('googleapis');
 const nodemailer = require('nodemailer');
 
 
-var bddQuery = function (con, query, args) {
+// TODO: change all function expressions to function declarations
+
+// --- SQL utils
+
+function bddQuery(con, query, args) {
     return new Promise(function (resolve, reject) {
         con.query(query, args, function (error, rows) {  // On cherche le mot de passe associé à ce
             // login, ainsi que "admin" qui indique si le compte est admin ou non
@@ -17,14 +21,19 @@ var bddQuery = function (con, query, args) {
             }
         });
     });
-};
+}
 
-var hash = function (word) {
+
+// --- DB utils
+
+function hash(word) {
     return SHA2["SHA-256"](word).toString("hex");
 }
 
-var sendError = function (res, message, error = "") {
-    if (error != "") {
+// -- HTTP utils
+
+function sendError(res, message, error = "") {
+    if (error !== "") {
     }
     if (!res.headersSent) {
         return res.status(400).send({message: message});
@@ -38,7 +47,6 @@ var sendSuccess = function (res, object) {
 }
 
 var whereIsAccount = function (con, login) {
-
     // On cherche avec cette fonction à déterminer si un certain login est dans la base des comptes approuvés, en attente, ou si le login n'est pas présent
     var table = "";   // Table : Dans quelle table a été trouvé le login
     return new Promise(function (resolve, reject) {
@@ -75,11 +83,13 @@ var currentDate = function () {
 
 }
 
+
 var oneYAgoDate = function () {
     var date = new Date()
     date.setFullYear(date.getFullYear() - 1);
     return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
 }
+
 
 var sendMail = function (mailOptions) {
     const transport = nodemailer.createTransport({
@@ -91,10 +101,9 @@ var sendMail = function (mailOptions) {
         }
     });
 
-    const result = transport.sendMail(mailOptions);
-    return result;
+    return transport.sendMail(mailOptions);
 }
-// Pour la V2
+
 
 var openBilletterie = function (event_id, con) {
     bddQuery(con, "UPDATE newEvents SET on_sale = 1 WHERE event_id = ?", [event_id])

@@ -46,16 +46,24 @@ conPortail.connect(error => {
 });
 
 
+// --- setup scheduler
+
+const {EventScheduler} = require('./functions/event_scheduler')
+const eventScheduler = new EventScheduler(conBDA)
+eventScheduler.resetSchedule()
+
 // --- start express app
 
 const app = express();
 
-app.listen(4000, function () {});
+app.listen(4000, function () {
+});
 
 app.use(express.json({limit: '8mb'}));
 app.use(function (req, res, next) {
-    req.conBDA = conBDA;
-    req.conPortail = conPortail;
+    req.conBDA = conBDA
+    req.conPortail = conPortail
+    req.eventScheduler = eventScheduler
     // req.transporter = transporter;
     console.log({laal: req.url});
     next();

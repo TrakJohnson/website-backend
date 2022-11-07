@@ -1,7 +1,7 @@
 const funcs = require('../functions/functions');
 const Event = require('../models/event');
 const Place = require('../models/place');
-const schedule = require('node-schedule')
+
 
 const getPlacesClaimedForEvent = async (conBda, event_id) => {
     return await funcs.bddQuery(conBDA, "SELECT * FROM newPlaces JOIN newUsers ON newPlaces.login = newUsers.login WHERE event_id = ?", [event_id])
@@ -256,6 +256,7 @@ exports.closeBilletterie = (req, res, next) => {
         .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error))
 }
 
+
 exports.reSaleBilletterie = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT points, on_sale FROM newEvents WHERE event_id=?", [req.body.id_billetterie])
         .then(async data => {
@@ -282,6 +283,7 @@ exports.reSaleBilletterie = (req, res, next) => {
         })
         .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error))
 }
+
 
 exports.givePlaceToUser = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT points, num_places FROM newEvents WHERE event_id=?", [req.body.id_billetterie])
@@ -437,23 +439,3 @@ exports.getEmailsBilletterie = (req, res, next) => {
             .then((data) => funcs.sendSuccess(res, data))
     }
 }
-
-/*
-  [
-  RowDataPacket {
-    login: '21boutaric2',
-    login_portail: '',
-    prenom: 'Clément',
-    nom: 'Boutaric',
-    email: 'clement.boutaric@etu.minesparis.psl.eu',
-    email_verified: 0,
-    email_mines: '',
-    password: '347d136165efb18fd4aba95eb62e573bf1b37aba4d2874f30ace451de9303b4ed42f8e860ff43db0752529e8bbb079d476dcdad3ce3677059c47e572b7257e87',
-    admin: 0,
-    contributor: 0,
-    date_creation: 2022-10-30T22:19:51.000Z,
-    date_last_con: 2022-10-30T23:32:44.000Z,
-    promo: 'P21',
-    points: 0
-  },
- */
