@@ -1,5 +1,4 @@
 const SHA2 = require("sha2");
-const {google} = require('googleapis');
 const nodemailer = require('nodemailer');
 
 
@@ -14,7 +13,7 @@ function bddQuery(con, query, args) {
             if (error) { // La requête a échoué
                 return reject(error);
             }
-            if (rows == undefined || rows?.length == 0) { // Si la requête ne renvoie rien
+            if (rows === undefined || rows?.length === 0) { // Si la requête ne renvoie rien
                 return resolve([]);
             } else {   // Si la requête a renvoyé qqchose
                 return resolve(rows);
@@ -52,13 +51,13 @@ var whereIsAccount = function (con, login) {
     return new Promise(function (resolve, reject) {
         bddQuery(con, "SELECT COUNT(*) FROM Rezal_test WHERE login = ?", [login])
             .then((num) => {
-                if (num[0]['COUNT(*)'] == 1) { // Trouvé
+                if (num[0]['COUNT(*)'] === 1) { // Trouvé
                     table = "Rezal_test";
                     return resolve(table);
                 } else {   // Pas trouvé dans la base des comptes approuvés, on cherche dans l'autre
                     bddQuery(con, "SELECT COUNT(*) FROM Rezal_attente WHERE login = ?", [login])
                         .then((num) => {
-                            if (num[0]['COUNT(*)'] == 1) { // Trouvé
+                            if (num[0]['COUNT(*)'] === 1) { // Trouvé
                                 table = "Rezal_attente";
                                 return resolve(table);
                             } else {    // Dans aucune des deux

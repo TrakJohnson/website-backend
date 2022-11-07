@@ -47,7 +47,7 @@ class EventScheduler {
             from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>',
             to: email,
             subject: `[BDA] Ouverture de la billetterie "${title}"`,
-            html : `<p>Bonjour,</p>
+            html: `<p>Bonjour,</p>
             <p>Ceci est un mail automatique pour annoncer l'ouverture automatique de la billetterie suivante:
             <br><b>${title}</b> 
             <br>https://bda-minesparis.fr/events/display/${eventId}</p>

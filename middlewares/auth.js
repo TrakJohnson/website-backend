@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const funcs = require('./../functions/functions');
 
-exports.authToken = (req,res,next) => {
+exports.authToken = (req, res, next) => {
     try {
         const now = new Date().getTime() / 1000
         const token = req.headers.authorization.split(' ')[1];
@@ -24,13 +24,13 @@ exports.findLoginInToken = (req, res, next) => {
     try {
         const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET')
         const login = decodedToken.login;
-        if (login != undefined && now < decodedToken.exp) {
+        if (login !== undefined && now < decodedToken.exp) {
             req.body.login = login;
             next();
         } else {
             return funcs.sendError(res, "Token expiré !");
         }
-    } catch(err) {
+    } catch (err) {
         console.log("Erreur de token:")
         console.log(err)
         return funcs.sendError(res, "Token error", err);
