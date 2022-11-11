@@ -36,7 +36,7 @@ class EventScheduler {
                         eventId.toString(),
                         EventScheduler.onEventSchedule.bind(null, this.con, eventId, email, title)
                     )
-                    this.events[eventId].schedule(dateTimeObj)
+                    this.events[eventId].schedule(dateTimeObj.toJSDate())
                 }
             })
     }
@@ -52,9 +52,12 @@ class EventScheduler {
             bcc: 'bda.rsi.minesparis@gmail.com',
             subject: `[BDA] Ouverture de la billetterie "${title}"`,
             html: `<p>Bonjour,</p>
-            <p>Ceci est un mail automatique pour annoncer l'ouverture automatique de la billetterie suivante:
-            <br><b>${title}</b> 
-            <br>https://bda-minesparis.fr/events/display/${eventId}</p>
+            <p>Ceci est un mail automatique pour annoncer l'ouverture de la billetterie suivante:</p>
+            <br>
+            <p><b>${title}</b> 
+            <br><a href="https://bda-minesparis.fr/events/display/${eventId}">
+            https://bda-minesparis.fr/events/display/${eventId}
+            </a></p>
             <p><i>Si c'est une erreur, n'hésitez pas à contacter les respos RSI</i></p>`
         }
         funcs.sendMail(emailOptions)
@@ -65,7 +68,6 @@ class EventScheduler {
     removeEventSchedule(eventId) {
         if (eventId in this.events) {
             console.log(`[scheduler] Event ${eventId} removed`)
-            console.log(schedule.scheduledJobs[eventId.toString()])  // this should be the same
             this.events[eventId].cancel()
             delete this.events[eventId]
         } else {
@@ -83,10 +85,10 @@ class EventScheduler {
             .bddQuery(this.con, "SELECT event_id, date_open FROM newEvents")
             .then((data) => {
                 for (let event of data) {
-                    let eventDate = new Date(event.date_open);
+                    let eventDate = DateTime.fromISO(event.date_open.replace(" ", "T"), {zone: "Europe/Paris"});
                     if (eventDate !== undefined) {
                         let now = Date.now();
-                        if (now < eventDate) {
+                        if (now < eventDate.toJSDate()) {
                             this.addEventSchedule(event.event_id)
                         }
                     }

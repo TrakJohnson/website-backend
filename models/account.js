@@ -1,6 +1,5 @@
 var Account = class Account {
     constructor(data) {
-        console.log(data)
         /* Les données de data proviennent directement de la requête SQL */
         this.prenom = data.prenom;
         this.nom = data.nom;
@@ -19,7 +18,6 @@ var Account = class Account {
     }  
 
     static updateAccountData(newInfos) {
-        console.log(this.login + " data update")
         this.prenom = newInfos.prenom !== undefined ? newInfos.prenom : this.prenom;
         this.nom = newInfos.nom !== undefined ? newInfos.nom : this.nom;
         this.login = newInfos.login !== undefined ? newInfos.login : this.login;
