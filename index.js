@@ -24,7 +24,8 @@ conBDA = mysql.createConnection({
     host: "mysql-bda-mines.alwaysdata.net",
     user: process.env["SQL_BDA_USER"],
     password: process.env["SQL_BDA_PASS"],
-    database: "53700_bda"
+    database: "53700_bda",
+    dateStrings: true // very important, else MySQL will transform the "datetime" columns on request
 });
 conBDA.connect(error => {
     if (error) {

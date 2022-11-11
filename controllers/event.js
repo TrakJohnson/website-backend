@@ -63,7 +63,7 @@ exports.getEventsTocome = (req, res, next) => {
             } else {
                 var eventsToSendToFrond = [];
                 const getData = async () => {
-                    for (var index = 0; index < data.length; index++) {
+                    for (let index = 0; index < data.length; index++) {
                         const eventData = data[index];
                         eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
                         eventsToSendToFrond.push(new Event(eventData));
@@ -76,7 +76,6 @@ exports.getEventsTocome = (req, res, next) => {
         })
         .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-0 & 405)", error))
 }
-
 
 exports.getEventsForCalendar = (req, res, next) => {
     // on ne prend que les évènements de l'année en cours et que les informations qui nous intéressent
@@ -97,8 +96,6 @@ exports.createEvent = (req, res, next) => {
     const body = req.body;
     funcs.bddQuery(req.conBDA, "INSERT INTO `newEvents` (`event_id`, `title`, `description`, `dateEvent`, `dateEvent_end`, `event_place`, `pole_id`, `login_creator`, `date_open`, `date_close`, `num_places`, `cost_contributor`, `cost_non_contributor`, `points`, `on_sale`, `thumbnail`, `is_billetterie`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [body.title, body.description, body.dateEvent, body.dateEvent_end, body.event_place, body.pole_id, body.loginSender, body.date_open, body.date_close, body.num_places, body.cost_contributor, body.cost_non_contributor, body.points, 0 /* Billetterie fermée lors de sa création*/, body.thumbnail, body.is_billetterie])
         .then(() => {
-
-
             // Pour la V2
             // if (body.is_billetterie){
             //     const open_this_billetterie = schedule.scheduleJob(body.date_open, funcs.openBilletterie(body.event_id, body.conBDA));
@@ -106,7 +103,6 @@ exports.createEvent = (req, res, next) => {
             // }
 
             funcs.sendSuccess(res, {message: "Evenement créé !"})
-
 
         })
         .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-1 & 405)", error))
@@ -167,6 +163,7 @@ exports.modifyBilletterie = (req, res, next) => {
             } else {
                 var event = new Event(data);
                 event.updateEventData(body);
+                console.log(event.date_open, event.date_open.toString())
                 funcs.bddQuery(req.conBDA, "UPDATE newEvents SET title=?, description=?, dateEvent=?, dateEvent_end=?, event_place=?, pole_id=?, date_open=?, date_close=?, num_places=?, cost_contributor=?, cost_non_contributor=?, points=?, on_sale = ?, thumbnail = ?, is_billetterie = ?  WHERE event_id = ?", [event.title, event.description, event.dateEvent, event.dateEvent_end, event.event_place, event.pole_id, event.date_open, event.date_close, event.num_places, event.cost_contributor, event.cost_non_contributor, event.points, event.on_sale, body.thumbnail, true, event.event_id])
                     .then(() => funcs.sendSuccess(res, {message: "Evenement modifié !"}))
                     .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-2 & 405)", error))
@@ -256,7 +253,6 @@ exports.closeBilletterie = (req, res, next) => {
         .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error))
 }
 
-
 exports.reSaleBilletterie = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT points, on_sale FROM newEvents WHERE event_id=?", [req.body.id_billetterie])
         .then(async data => {
@@ -283,7 +279,6 @@ exports.reSaleBilletterie = (req, res, next) => {
         })
         .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error))
 }
-
 
 exports.givePlaceToUser = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT points, num_places FROM newEvents WHERE event_id=?", [req.body.id_billetterie])
@@ -388,7 +383,6 @@ exports.getSomeBilletteries = async (req, res, next) => {
     funcs.sendSuccess(res, eventsToSendFront);
 }
 
-
 exports.modifyEvent = (req, res, next) => {
     const body = req.body;
 
@@ -416,7 +410,6 @@ exports.modifyEvent = (req, res, next) => {
         .catch((error) => funcs.sendError(res, "Impossible de mofifier la billetterie, merci de contacter un administrateur.", error))
 }
 
-
 exports.deleteEvent = (req, res, next) => {
     // On a juste à supprimer l'évènement (pas de place liée)
     const body = req.body;
@@ -428,7 +421,6 @@ exports.deleteEvent = (req, res, next) => {
             res, "Erreur lors de la suppression de l'évènement, contactez un administrateur.", error
         ))
 }
-
 
 exports.getEmailsBilletterie = (req, res, next) => {
     const body = req.body;

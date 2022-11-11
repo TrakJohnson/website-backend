@@ -32,6 +32,9 @@ function hash(word) {
 // -- HTTP utils
 
 function sendError(res, message, error = "") {
+    console.log("\x1b[31m Error encountered:\x1b[0m")
+    console.log(error)
+
     if (error !== "") {
     }
     if (!res.headersSent) {
