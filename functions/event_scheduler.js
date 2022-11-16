@@ -53,7 +53,6 @@ class EventScheduler {
             subject: `[BDA] Ouverture de la billetterie "${title}"`,
             html: `<p>Bonjour,</p>
             <p>Ceci est un mail automatique pour annoncer l'ouverture de la billetterie suivante:</p>
-            <br>
             <p><b>${title}</b> 
             <br><a href="https://bda-minesparis.fr/events/display/${eventId}">
             https://bda-minesparis.fr/events/display/${eventId}

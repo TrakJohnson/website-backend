@@ -235,10 +235,10 @@ exports.closeBilletterie = (req, res, next) => {
                     await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=0 WHERE event_id=?", [req.body.id_billetterie]);
                     funcs.bddQuery(req.conBDA, "SELECT * FROM newUsers JOIN newPlaces ON newUsers.login = newPlaces.login WHERE event_id=? ORDER BY contributor DESC, points, place_ID", [req.body.id_billetterie])
                         .then(async data => {
-                            for (var i = 0; i < Math.min(numPlaces, data.length); i++) {
+                            /*for (var i = 0; i < Math.min(numPlaces, data.length); i++) {
                                 await funcs.bddQuery(req.conBDA, "UPDATE newPlaces SET status=1 WHERE event_id=? AND login=?", [req.body.id_billetterie, data[i].login]);
                                 await funcs.bddQuery(req.conBDA, "UPDATE newUsers SET points=points+?+(SELECT size FROM newPlaces WHERE login=? AND event_id=?)-1 WHERE login=?", [pointsToAdd, data[i].login, req.body.id_billetterie, data[i].login]);
-                            }
+                            }*/
                             await funcs.bddQuery(req.conBDA, "UPDATE newEvents SET on_sale=0 WHERE event_id=?", [req.body.id_billetterie]);
                             funcs.sendSuccess(res, {message: "Evenement retiré de la vente avec succès !"})
                         })

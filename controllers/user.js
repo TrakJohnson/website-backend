@@ -104,6 +104,7 @@ exports.claimePlace = (req, res, next) => {
             // On vérifie qu'une place n'existe pas déjà à ce nom
             funcs.bddQuery(req.conBDA, "SELECT * FROM newPlaces WHERE event_id=? AND login=?", [req.body.id_billetterie, req.body.login])
             .then((dataPlace) => {
+                console.log(`[paps][id=${req.body.id_billetterie}] ${req.body.login} @ ${new Date().toLocaleString('fr-FR', {timeZone: 'Europe/Paris'})}`)
                 if (dataPlace.length > 0) {
                     funcs.sendSuccess(res, {message : "Demande enregistrée"});
                 } else {
