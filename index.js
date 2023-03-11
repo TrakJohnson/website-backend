@@ -21,7 +21,7 @@ const contactRoutes = require('./routes/contactRoutes')
 
 // BDA
 conBDA = mysql.createConnection({
-    host: "mysql-bda-mines.alwaysdata.net",
+    host: process.env["SQL_BDA_HOST"],
     user: process.env["SQL_BDA_USER"],
     password: process.env["SQL_BDA_PASS"],
     database: "53700_bda",
