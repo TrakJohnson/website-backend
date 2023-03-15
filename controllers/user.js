@@ -145,29 +145,25 @@ exports.getPlacesClaimedByUser = (req, res, next) => {
 }
 
 exports.createAccount = (req, res, next) => {
-
     const body = req.body;
-    if (body.loginAccountCreated && body.prenom && body.nom && body.email && body.password && body.admin && body.promotion) {
-        return funcs.sendError(res, "Il manque des informations pour créer le compte !");
-    }
-    //we have to chekc if nobody has the same login yet
+
     funcs.bddQuery(req.conBDA, "SELECT COUNT(*) FROM newUsers WHERE login LIKE ?", req.body.loginAccountCreated + '%') //retourne le nombre de compte ayant eu le meme login assigné par défaut
     .then((data) => {
-
-        var index = data[0]['COUNT(*)'];
-
-        if (index != 0) {
-            req.body.loginAccountCreated = req.body.loginAccountCreated + String(index + 1);
+        let index = data[0]['COUNT(*)'];
+        if (index > 0) {
+            funcs.sendError(res, "Erreur, ce compte existe déjà ! Merci de récupérer votre mot de passe, ou de contacter un administrateur.")
         }
-        // We have all info we need to create account
+
         const creationDate = currentDate();
         const lastConDate = currentDate();
-        funcs.bddQuery(req.conBDA, 'INSERT INTO newUsers (login, prenom, nom, email, email_verified, password, admin, contributor, date_creation, date_last_con, promo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); ', [req.body.loginAccountCreated, body.prenom, body.nom, body.email, false /*email verified : no*/, body.password, body.admin, 0 /* not contributor by default*/ , creationDate, lastConDate, body.promotion])
-        .then(() => {next()})
-        .catch((error) => {return funcs.sendError(res, "Erreur lors de la création du compte");})
-        
+        funcs.bddQuery(
+            req.conBDA, 'INSERT INTO newUsers (login, prenom, nom, email, email_verified, password, admin, contributor, date_creation, date_last_con, promo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); ',
+            [req.body.loginAccountCreated, body.prenom, body.nom, body.email, false /*email verified : no*/, body.password, body.admin, 0 /* not contributor by default*/ , creationDate, lastConDate, body.promotion]
+        )
+            .then(() => next())
+            .catch((err) => { funcs.sendError(res, "Erreur lors de la création du compte") })
     })
-    .catch((error) => {return funcs.sendError(res, "Erreur lors de la création du compte");})
+    .catch((err) => funcs.sendError(res, "Erreur lors de la création du compte"))
 }
 
 exports.modifyAccount = (req, res, next) => {
@@ -206,7 +202,33 @@ exports.modifyAccount = (req, res, next) => {
 
     })
 }
-   
+
+/**
+ * Récupère les informations sur la BDD du portail des élèves
+ * Sert ensuite à créer un compte BDA à partir de ces informations
+ */
+exports.getPortailInfo = (req, res, next) => {
+    const body = req.body;
+    funcs.bddQuery(req.conPortail, "SELECT * FROM portail.auth_user WHERE username=?", [body.idPortail])
+        .then((data) => {
+            if (data.length === 0) {
+                return funcs.sendError(res, "L'identifiant du portail n'existe pas. " +
+                    "Si vous n'avez pas de compte sur le portail, merci d'utiliser l'inscription classique.",
+                    body.idPortail + " : cet identifiant n'existe pas sur le portail")
+            } else if (data.length === 1) {
+                let queryRes = data[0];
+                let id = queryRes['username'];
+                let promo = id[0] === 'i' ? 'ISUP' + id.slice(1, 3) : 'P' + id.slice(0, 2);
+                return funcs.sendSuccess(res, {
+                    prenom: queryRes['first_name'],
+                    nom: queryRes['last_name'],
+                    email: queryRes['email'],
+                    promotion: promo
+                })
+            }
+        })
+        .catch((err) => funcs.sendError(res, "Erreur dans la vérification du portail"))  // TODO: return funcs sendError
+}
 
 exports.createDemandVerification = (req, res, next) => {
     let num = Math.floor(Math.random() * (1_000_000_000))
@@ -224,8 +246,6 @@ exports.createDemandVerification = (req, res, next) => {
 }
 
 exports.SendVerificationEmail  = (req, res, next) => {
-
-
     email1Options = {
         from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
         to: req.body.email, // list of receivers
@@ -241,9 +261,6 @@ exports.SendVerificationEmail  = (req, res, next) => {
         subject: "[BDA] Informations de connexion", // Subject line
         html : "<p> Bonjour, </p> <p> Tes informations de connexion sont : </p> <br> login : " + req.body.loginAccountCreated + "<br> Mot de passe : celui entré lors de la création de ton compte"
     }
-
-
-
 
     funcs.sendMail(email1Options)
     .then(() => {
