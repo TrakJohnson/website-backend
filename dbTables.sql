@@ -167,3 +167,10 @@ CREATE TABLE `places` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2023-07-26  2:22:39
+
+CREATE TABLE `VerificationEmail` (
+  `login` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `code` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
+  `dateDemand` varchar(30) COLLATE utf8mb4_general_ci NOT NULL,
+  PRIMARY KEY (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

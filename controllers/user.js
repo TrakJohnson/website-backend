@@ -63,7 +63,7 @@ exports.loginFromToken = (req, res, next) => {
         funcs.bddQuery(req.conBDA, 'SELECT * FROM newUsers WHERE login = ?', [req.body.login])
         .then((dataUser) => {
             if (dataUser == undefined || dataUser.length == 0) {
-                return funcs.sendError(res, "Login non reconnu", error);
+                return funcs.sendError(res, "Login non reconnu");
             }
             funcs.bddQuery(conBDA, "SELECT * FROM newPlaces WHERE login = ?", [req.body.login])
             .then((dataPlaces) => {
@@ -157,17 +157,18 @@ exports.createAccount = (req, res, next) => {
         const creationDate = currentDate();
         const lastConDate = currentDate();
         funcs.bddQuery(
-            req.conBDA, 'INSERT INTO newUsers (login, prenom, nom, email, email_verified, password, admin, contributor, date_creation, date_last_con, promo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); ',
-            [req.body.loginAccountCreated, body.prenom, body.nom, body.email, false /*email verified : no*/, body.password, body.admin, 0 /* not contributor by default*/ , creationDate, lastConDate, body.promotion]
+            req.conBDA, 'INSERT INTO newUsers (login,login_portail, prenom, nom, email, email_verified,email_mines, password, admin, contributor, date_creation, date_last_con, promo,points) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,0); ',
+            [req.body.loginAccountCreated,req.body.loginAccountCreated, body.prenom, body.nom, body.email, false /*email verified : no*/,body.email, body.password, body.admin, 0 /* not contributor by default*/ , creationDate, lastConDate, body.promotion]
         )
             .then(() => next())
-            .catch((err) => { funcs.sendError(res, "Erreur lors de la création du compte") })
+            .catch((err) => { console.log(err);funcs.sendError(res, "Erreur lors de la création du compte") })
     })
     .catch((err) => funcs.sendError(res, "Erreur lors de la création du compte"))
 }
 
 exports.modifyAccount = (req, res, next) => {
-    const body = req.body;
+    const body = req.body.newInfos;
+    console.log(body)
     if (body.token && body.prenom && body.nom && body.email && body.password && body.promotion) {
         return funcs.sendError(res, "Il manque des informations pour modifier le compte !");
     }
@@ -250,11 +251,10 @@ exports.SendVerificationEmail  = (req, res, next) => {
         from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
         to: req.body.email, // list of receivers
         subject: "[BDA] Verification adresse mail", // Subject line
-        html : "<p> Bonjour, </p> <p> tu as créé un compte avec cet email sur le site du BDA des Mines Paristech, si cela n'est pas le cas, contacte les administrateurs ou répond à cet email. <br> Pour vérifier cet email, clique sur ce lien : <br> 'http://bda-mines.alwaysdata.net/register/verify-email/" + req.body.hash + " </p>"
+        html : "<p> Bonjour, </p> <p> tu as créé un compte avec cet email sur le site du BDA des Mines Paristech, si cela n'est pas le cas, contacte les administrateurs ou répond à cet email. <br> Pour vérifier cet email, clique sur ce <a href='http://"+process.env["SITE_URL"]+"/register/verify-email/" + req.body.hash + "'>lien</a> </p>"
     }
 
     // Email with connection IDs (login & password)
-
     email2Options = {
         from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
         to: req.body.email, // list of receivers
