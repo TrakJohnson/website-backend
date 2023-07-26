@@ -1,5 +1,5 @@
 const express = require('express');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const path = require('path');
 
 // imports .env + environment variables
@@ -24,7 +24,7 @@ conBDA = mysql.createConnection({
     host: process.env["SQL_BDA_HOST"],
     user: process.env["SQL_BDA_USER"],
     password: process.env["SQL_BDA_PASS"],
-    database: "53700_bda",
+    database: "bda",
     dateStrings: true // very important, else MySQL will transform the "datetime" columns on request
 });
 conBDA.connect(error => {
