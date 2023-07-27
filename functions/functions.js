@@ -100,12 +100,12 @@ var sendMail = function (mailOptions) {
         service: 'gmail',
         host: 'smtp.gmail.com',
         auth: {
-            user: process.env["TEST_MAIL_SENDER"], //'bda.rsi.minesparis@gmail.com',
+            user: process.env["MAIL_SENDER"], //'bda.rsi.minesparis@gmail.com',
             pass: process.env['GMAIL_PASS']
         }
     });
 
-    return transport.sendMail(mailOptions); /*, (error, info) => {
+    return transport.sendMail(mailOptions);/*, (error, info) => {
         if (error) {
             return console.log(error);
         }

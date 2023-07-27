@@ -145,7 +145,7 @@ exports.getPlacesClaimedByUser = (req, res, next) => {
 }
 
 exports.createAccount = (req, res, next) => {
-    const body = req.body;
+    const body = req["body"];
 
     funcs.bddQuery(req.conBDA, "SELECT COUNT(*) FROM newUsers WHERE login LIKE ?", req.body.loginAccountCreated + '%') //retourne le nombre de compte ayant eu le meme login assigné par défaut
     .then((data) => {
@@ -167,22 +167,25 @@ exports.createAccount = (req, res, next) => {
 }
 
 exports.modifyAccount = (req, res, next) => {
-    const body = req.body.newInfos;
-    console.log(body)
-    if (body.token && body.prenom && body.nom && body.email && body.password && body.promotion) {
-        return funcs.sendError(res, "Il manque des informations pour modifier le compte !");
-    }
-    var old_email;
+    const body = req.body;
     funcs.bddQuery(req.conBDA, "SELECT email FROM newUsers WHERE login = ?", [body.login])
     .then((data)=> {
-        old_email = data[0].email;
-        funcs.bddQuery(req.conBDA, "UPDATE newUsers SET prenom=?, nom=?, email=?, promo=?, password=? WHERE login = ?", [body.prenom, body.nom, body.email, body.promo, body.password, body.login])
-        .then(()=> {
+        let old_email = data[0].email;
+        
+        let reqs = []
+        
+        for (field in body.newInfos){
+            if (body.newInfos[field] == undefined){
+                continue;
+            }
+            reqs.push(funcs.bddQuery(req.conBDA, "UPDATE newUsers SET "+field+" = ? WHERE login = ?", [body.newInfos[field],body.login]));
+        }
+        Promise.all(reqs).then(()=> {
             emailOptions = {
                 from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
                 to: old_email, // list of receivers
                 subject: "[BDA] Modification des informations du compte", // Subject line
-                html : "<p> Bonjour, </p> <p> les informations de ton compte viennent d'être changées sur le portail BDA, si cela n'est pas le cas, contacte un administrateur.</p>"
+                html : "<p> Bonjour, </p> <p> les informations de ton compte viennent d'être changées sur le portail BDA, si tu n'en es pas à l'origine, contacte un administrateur.</p>"
             }
             funcs.sendMail(emailOptions)
             .then((result) => {
@@ -195,8 +198,7 @@ exports.modifyAccount = (req, res, next) => {
         .catch((err) => {
             
             return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", err)
-        })
-
+        });
     })
     .catch(error => {
         return funcs.sendError(res, "Erreur, merci de contacter un administrateur !");
