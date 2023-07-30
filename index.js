@@ -83,3 +83,17 @@ app.use('/api/team', teamRoutes);
 app.use('/api/pole', poleRoutes);
 app.use('/api/recover', recoverRoutes);
 app.use('/api/contact', contactRoutes);
+
+function keepDBConAlive(con)
+{
+    return function() {
+        var sql_keep = `SELECT 1 + 1 AS solution`; 
+        con.query(sql_keep, function (err, result) {
+          if (err) throw err;
+          console.log("Ping DB");
+        });
+    }
+}
+
+setInterval(keepDBConAlive(conBDA), 3600*1000);
+setInterval(keepDBConAlive(conPortail), 3600*1000);

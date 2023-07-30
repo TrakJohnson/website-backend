@@ -8,3 +8,6 @@ Quelques liens pour développeurs :
 - [Pour démarrer](doc/startup.md)
 - [Infos spécifiques au backend](doc/manuel_dev.md)
 - [Configuration du serveur à distance](https://github.com/bda-mines-paris/.github/wiki/D%C3%A9veloppement-du-site)
+
+commande pour upload sur ec2:
+pscp -r -i .\cleBDA.ppk ./* ec2-user@ec2-54-166-175-189.compute-1.amazonaws.com:/home/ec2-user
