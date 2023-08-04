@@ -54,6 +54,8 @@ const {EventScheduler} = require('./functions/event_scheduler')
 const eventScheduler = new EventScheduler(conBDA)
 eventScheduler.resetSchedule()
 
+const {PlaceHandler} = require('./functions/place_handler')
+const placeHandler = new PlaceHandler()
 // --- start express app
 
 const app = express();
@@ -66,6 +68,7 @@ app.use(function (req, res, next) {
     req.conBDA = conBDA
     req.conPortail = conPortail
     req.eventScheduler = eventScheduler
+    req.placeHandler = placeHandler
     // req.transporter = transporter;
     console.log({laal: req.url});
     next();
