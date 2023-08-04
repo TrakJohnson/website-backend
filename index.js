@@ -13,8 +13,9 @@ const userRoutes = require('./routes/userRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const teamRoutes = require('./routes/teamRoutes');
 const poleRoutes = require('./routes/poleRoutes');
-const recoverRoutes = require('./routes/recoverRoutes')
-const contactRoutes = require('./routes/contactRoutes')
+const recoverRoutes = require('./routes/recoverRoutes');
+const contactRoutes = require('./routes/contactRoutes');
+const placeRoutes = require('./routes/placeRoutes');
 
 
 // --- SQL connections
@@ -83,6 +84,7 @@ app.use('/api/team', teamRoutes);
 app.use('/api/pole', poleRoutes);
 app.use('/api/recover', recoverRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/r/meuh', placeRoutes);
 
 function keepDBConAlive(con)
 {
