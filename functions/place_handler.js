@@ -9,12 +9,18 @@ function rgbToHex(r, g, b) {
     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
+/*function rgbToHex(c){
+    return rgbToHex(...c)
+}*/
+
 class PlaceHandler {
-    width = 10
-    height = 10
+    width = 100
+    height = 100
     
     grid = []
     palette = []
+    
+    acideRate = 10*60; //every ten minutes a random pixel is changed
     
     constructor() {
         //this.grid = []
@@ -28,7 +34,9 @@ class PlaceHandler {
             }
             this.grid.push(line)
         }
-        this.acidStep()
+        
+        this.acidRate = 10*60;
+        setInterval(()=>{this.acidStep()},this.acidRate*10000);
     }
     
     getGrid(){
@@ -58,18 +66,32 @@ class PlaceHandler {
     
     acidStep()
     {
+        console.log("wtf")
         let x = funcs.randInt(this.width);
         let y = funcs.randInt(this.height);
         //y = funcs.randInt(this.height);
         let v = funcs.randInt(this.nColor);
-        let t = funcs.randInt(10)+3;
+        //let t = funcs.randInt(15)+8;
+        //t = 3600/2
         //console.log(y, this.height)
         
         this.grid[y][x] = this.makePixel(v);
         
-        setTimeout(()=>{this.acidStep()}, t*1000);
+        //setTimeout(()=>{this.acidStep()}, t*1000);
     }
     
+    updatePixel(pixel){
+        console.log(pixel)
+        this.grid[pixel.y][pixel.x] = this.makePixel(pixel.colorIndex)
+    }
+    
+    getPalette(){
+        return this.palette.map((c,index)=>{
+            return {   colorHex: rgbToHex(...c),
+                colorIndex: index
+            }
+        })
+    }
     
 }
 

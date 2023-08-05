@@ -7,5 +7,13 @@ exports.updateClientGrid = (req, res, next) => {
 }
 
 exports.getPalette = (req, res, next) => {
-    funcs.sendSuccess(res, {'nColor': req.placeHandler.nColor, 'colors': req.placeHandler.palette});
+    let palette = req.placeHandler.getPalette();
+    console.log(palette)
+    funcs.sendSuccess(res, {'nColor': req.placeHandler.nColor, 'colors': palette});
+}
+
+exports.requestPixelChange = (req, res, next) => {
+    //console.log(req)
+    req.placeHandler.updatePixel(req.body.pixel)
+    funcs.sendSuccess(res, {msg: 'pixel changed !'})
 }
