@@ -1,4 +1,5 @@
 const funcs = require("./functions")
+const fs = require('fs');
 
 function componentToHex(c) {
     var hex = c.toString(16);
@@ -21,11 +22,23 @@ class PlaceHandler {
     palette = []
     
     acideRate = 10*60; //every ten minutes a random pixel is changed
+    saveFreq = -1;
+    initComplete = false;
     
     constructor() {
         //this.grid = []
         //console.log(this.height)
         this.initPalette()
+        this.initEmptyGrid()
+        
+        this.acidRate = 10*60;
+        this.saveFreq = 30;
+        this.initComplete = false;
+        setInterval(()=>{this.acidStep()},this.acidRate*1000);
+        setInterval(()=>{this.saveGrid()}, this.saveFreq*1000);
+    }
+    
+    initEmptyGrid(){
         for(let i = 0; i < this.height; i+=1)
         {
             let line = []
@@ -35,8 +48,29 @@ class PlaceHandler {
             this.grid.push(line)
         }
         
-        this.acidRate = 10*60;
-        setInterval(()=>{this.acidStep()},this.acidRate*10000);
+        this.saveGrid()
+    }
+    
+    saveGrid(){
+        if(!this.initComplete){
+            return;
+        }
+        fs.writeFile("persistentGrid.json", JSON.stringify(this.grid),(err)=>{
+            if(err){
+                console.log(err)
+            }
+            console.log("saved grid");
+        })
+    }
+    
+    restorePersistentGrid(){
+        try{
+            this.grid = JSON.parse(fs.readFileSync('persistentGrid.json'))
+        }catch(err){
+            this.initEmptyGrid();
+        }
+        
+        this.initComplete = true;
     }
     
     getGrid(){

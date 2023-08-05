@@ -56,6 +56,7 @@ eventScheduler.resetSchedule()
 
 const {PlaceHandler} = require('./functions/place_handler')
 const placeHandler = new PlaceHandler()
+placeHandler.restorePersistentGrid()
 // --- start express app
 
 const app = express();
