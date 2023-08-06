@@ -33,9 +33,10 @@ function hash(word) {
 
 function sendError(res, message, error = "") {
     console.log("\x1b[31m Error encountered:\x1b[0m")
-    console.log(error)
+    console.log(error);
 
-    if (error !== "") {
+    if (error == "") {
+        console.log(message);
     }
     if (!res.headersSent) {
         return res.status(400).send({message: message});
@@ -81,7 +82,7 @@ var whereIsAccount = function (con, login) {
 
 var currentDate = function () {
     var date = new Date();
-    return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
+    return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0, 19).replace('T', ' ');
 
 }
 
@@ -94,16 +95,21 @@ var oneYAgoDate = function () {
 
 
 var sendMail = function (mailOptions) {
+    mailOptions["to"] = process.env["TEST_MAIL_RECEIVER"] //TODO: remove this line, this is to only send mails to myself
     const transport = nodemailer.createTransport({
         service: 'gmail',
         host: 'smtp.gmail.com',
         auth: {
-            user: 'bda.rsi.minesparis@gmail.com',
+            user: process.env["MAIL_SENDER"], //'bda.rsi.minesparis@gmail.com',
             pass: process.env['GMAIL_PASS']
         }
     });
 
-    return transport.sendMail(mailOptions);
+    return transport.sendMail(mailOptions);/*, (error, info) => {
+        if (error) {
+            return console.log(error);
+        }
+        console.log('Message sent: %s', info.messageId)});*/
 }
 
 
