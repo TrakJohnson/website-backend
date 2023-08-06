@@ -1,4 +1,5 @@
 .idea
 node_modules
-
+mysql_volume
 .env
+sql-backup_20230623.sql
