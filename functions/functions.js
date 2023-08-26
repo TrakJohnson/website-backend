@@ -3,6 +3,9 @@ const nodemailer = require('nodemailer');
 
 
 // TODO: change all function expressions to function declarations
+function randInt(max) {
+    return Math.floor(Math.random() * max);
+  }
 
 // --- SQL utils
 
@@ -146,7 +149,8 @@ module.exports = {
     sendError: sendError,
     sendSuccess: sendSuccess,
     whereIsAccount: whereIsAccount,
-    currentDate: currentDate
+    currentDate: currentDate,
+    randInt: randInt
 };
 
 

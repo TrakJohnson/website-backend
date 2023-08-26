@@ -13,8 +13,9 @@ const userRoutes = require('./routes/userRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const teamRoutes = require('./routes/teamRoutes');
 const poleRoutes = require('./routes/poleRoutes');
-const recoverRoutes = require('./routes/recoverRoutes')
-const contactRoutes = require('./routes/contactRoutes')
+const recoverRoutes = require('./routes/recoverRoutes');
+const contactRoutes = require('./routes/contactRoutes');
+const placeRoutes = require('./routes/placeRoutes');
 
 
 // --- SQL connections
@@ -53,6 +54,9 @@ const {EventScheduler} = require('./functions/event_scheduler')
 const eventScheduler = new EventScheduler(conBDA)
 eventScheduler.resetSchedule()
 
+const {PlaceHandler} = require('./functions/place_handler')
+const placeHandler = new PlaceHandler()
+placeHandler.restorePersistentGrid()
 // --- start express app
 
 const app = express();
@@ -65,6 +69,7 @@ app.use(function (req, res, next) {
     req.conBDA = conBDA
     req.conPortail = conPortail
     req.eventScheduler = eventScheduler
+    req.placeHandler = placeHandler
     // req.transporter = transporter;
     console.log({laal: req.url});
     next();
@@ -83,6 +88,7 @@ app.use('/api/team', teamRoutes);
 app.use('/api/pole', poleRoutes);
 app.use('/api/recover', recoverRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/r/meuh', placeRoutes);
 
 function keepDBConAlive(con)
 {
