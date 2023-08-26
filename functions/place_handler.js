@@ -15,8 +15,8 @@ function rgbToHex(r, g, b) {
 }*/
 
 class PlaceHandler {
-    width = 100
-    height = 100
+    width = 80
+    height = 80
     
     grid = []
     palette = []
@@ -34,7 +34,7 @@ class PlaceHandler {
         this.acidRate = 10*60;
         this.saveFreq = 30;
         this.initComplete = false;
-        setInterval(()=>{this.acidStep()},this.acidRate*1000);
+        //setInterval(()=>{this.acidStep()},this.acidRate*1000);
         setInterval(()=>{this.saveGrid()}, this.saveFreq*1000);
     }
     
@@ -55,7 +55,7 @@ class PlaceHandler {
         if(!this.initComplete){
             return;
         }
-        fs.writeFile("persistentGrid.json", JSON.stringify(this.grid),(err)=>{
+        fs.writeFile("persistentGrid.json", JSON.stringify({width: this.width, height: this.height, grid:this.grid}),(err)=>{
             if(err){
                 console.log(err)
             }
@@ -65,7 +65,14 @@ class PlaceHandler {
     
     restorePersistentGrid(){
         try{
-            this.grid = JSON.parse(fs.readFileSync('persistentGrid.json'))
+            var saved = JSON.parse(fs.readFileSync('persistentGrid.json'))
+            if (saved.height != this.height || saved.width != this.width){
+                console.log("Error restoring meuh's grid: the saved dimensions doesn't match the current dimensions")
+            }
+            else{
+                this.grid = saved.grid
+            }
+            
         }catch(err){
             this.initEmptyGrid();
         }

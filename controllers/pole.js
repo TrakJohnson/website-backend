@@ -6,10 +6,11 @@ const Pole = require('../models/pole');
 exports.getPoles = (req, res, next) => {
     funcs.bddQuery(req.conBDA, "SELECT * FROM newPoles")
     .then(async (data) => {
+        var defaultPole = new Pole({pole_id: 0, name: "Autres", description:"Autres poles", members:[], hasBilleterie: false, color: "#000000"});
         if (data == undefined || data.length < 1) {
-            funcs.sendSuccess(res, [])
+            funcs.sendSuccess(res, [defaultPole])
         } else {
-            var polesToSendToFrond = [];
+            var polesToSendToFront = [defaultPole];
             const getData = async () => {
                 for (var i = 0; i < data.length; i++) {
                     var poleData = data[i];
@@ -22,11 +23,11 @@ exports.getPoles = (req, res, next) => {
                         poleData.members[j] = new Member(poleData.members[j]);
                         // console.log({member : poleData.members[j] });
                     }
-                    polesToSendToFrond.push(new Pole(poleData));
+                    polesToSendToFront.push(new Pole(poleData));
                 }
             }
             await getData();
-            funcs.sendSuccess(res, polesToSendToFrond);
+            funcs.sendSuccess(res, polesToSendToFront);
         }
     })
     .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-0 & 405)", error))

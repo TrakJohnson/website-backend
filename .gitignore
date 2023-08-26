@@ -5,3 +5,6 @@ mysql_volume
 sql-backup_20230623.sql
 *.pem
 *.ppk
+persistentGrid.json
+persistentGridSave.json
+test.py
