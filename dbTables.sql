@@ -53,7 +53,7 @@ DROP TABLE IF EXISTS `newmembers`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `newmembers` (
   `login` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `id` smallint NOT NULL,
+  `id` smallint NOT NULL AUTO_INCREMENT,
   `pole_id` int NOT NULL,
   `role` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,

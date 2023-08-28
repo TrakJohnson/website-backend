@@ -25,7 +25,7 @@ conBDA = mysql.createConnection({
     host: process.env["SQL_BDA_HOST"],
     user: process.env["SQL_BDA_USER"],
     password: process.env["SQL_BDA_PASS"],
-    database: "bda",
+    database: process.env["SQL_SCHEMA"],
     dateStrings: true // very important, else MySQL will transform the "datetime" columns on request
 });
 conBDA.connect(error => {

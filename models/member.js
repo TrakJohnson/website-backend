@@ -3,6 +3,7 @@ var Member = class Member {
         this.prenom = data.prenom;
         this.nom = data.nom;
         this.login = data.login;
+        this.login_portail = data.login_portail;
         this.pole_id = data.pole_id;
         this.role = data.role;
         this.promo = data.promo;

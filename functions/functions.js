@@ -98,7 +98,7 @@ var oneYAgoDate = function () {
 
 
 var sendMail = function (mailOptions) {
-    mailOptions["to"] = process.env["TEST_MAIL_RECEIVER"] //TODO: remove this line, this is to only send mails to myself
+    //mailOptions["to"] = process.env["TEST_MAIL_RECEIVER"] //TODO: remove this line, this is to only send mails to myself
     const transport = nodemailer.createTransport({
         service: 'gmail',
         host: 'smtp.gmail.com',

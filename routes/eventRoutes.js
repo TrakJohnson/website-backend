@@ -6,10 +6,10 @@ const { route } = require('./userRoutes');
 
 
 // Fonctions communes à tous les events
-router.get('/getOneEvent', eventCtrl.getOneEvent);
 router.get('/getAllEvents', eventCtrl.getAllEvents);
 router.get('/getEventsTocome', eventCtrl.getEventsTocome);
-router.get('/getEventsForCalendar', eventCtrl.getEventsForCalendar)
+router.get('/getEventsForCalendar', eventCtrl.getEventsForCalendar);
+router.get('/getOneEvent', eventCtrl.getOneEvent);
 
 router.get('/getBilletteriesToCome', eventCtrl.getBilletteriesToCome);
 router.get('/getAllBilletteries', eventCtrl.getAllBilletteries);
