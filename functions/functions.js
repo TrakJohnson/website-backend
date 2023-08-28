@@ -103,16 +103,18 @@ var sendMail = function (mailOptions) {
         service: 'gmail',
         host: 'smtp.gmail.com',
         auth: {
-            user: process.env["MAIL_SENDER"], //'bda.rsi.minesparis@gmail.com',
-            pass: process.env['GMAIL_PASS']
+            user: process.env["MAIL_SENDER"], 
+            pass: process.env["MAIL_PASS"]
         }
     });
+    console.log(transport)
 
     return transport.sendMail(mailOptions);/*, (error, info) => {
         if (error) {
             return console.log(error);
         }
-        console.log('Message sent: %s', info.messageId)});*/
+        console.log('Message sent: %s', info.messageId)
+        });*/
 }
 
 
