@@ -29,4 +29,4 @@ var Book = class Book {
     }
 }
 
-module.exports = Account;
+module.exports = Book;

@@ -39,16 +39,16 @@ exports.getAllEvents = (req, res, next) => {
             if (data == undefined || data.length < 1) {
                 funcs.sendSuccess(res, [])
             } else {
-                var eventsToSendToFrond = [];
+                var eventsToSendToFront = [];
                 const getData = async () => {
                     for (var index = 0; index < data.length; index++) {
                         const eventData = data[index];
                         eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
-                        eventsToSendToFrond.push(new Event(eventData));
+                        eventsToSendToFront.push(new Event(eventData));
                     }
                 }
                 await getData();
-                funcs.sendSuccess(res, eventsToSendToFrond);
+                funcs.sendSuccess(res, eventsToSendToFront);
             }
         })
         .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-0 & 405)", error))
@@ -60,16 +60,16 @@ exports.getEventsTocome = (req, res, next) => {
             if (data == undefined || data.length < 1) {
                 funcs.sendSuccess(res, []);
             } else {
-                var eventsToSendToFrond = [];
+                var eventsToSendToFront = [];
                 const getData = async () => {
                     for (let index = 0; index < data.length; index++) {
                         const eventData = data[index];
                         eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
-                        eventsToSendToFrond.push(new Event(eventData));
+                        eventsToSendToFront.push(new Event(eventData));
                     }
                 }
                 await getData();
-                funcs.sendSuccess(res, eventsToSendToFrond);
+                funcs.sendSuccess(res, eventsToSendToFront);
 
             }
         })
@@ -325,17 +325,17 @@ exports.getBilletteriesToCome = (req, res, next) => {
             if (data == undefined || data.length < 1) {
                 funcs.sendSuccess(res, [])
             } else {
-                var eventsToSendToFrond = [];
+                var eventsToSendToFront = [];
                 const getData = async () => {
                     for (var index = 0; index < data.length; index++) {
                         const eventData = data[index];
                         eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
                         var event_to_push = new Event(eventData)
-                        eventsToSendToFrond.push(event_to_push);
+                        eventsToSendToFront.push(event_to_push);
                     }
                 }
                 await getData();
-                funcs.sendSuccess(res, eventsToSendToFrond);
+                funcs.sendSuccess(res, eventsToSendToFront);
             }
         })
         .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-0 & 405)", error))
@@ -347,16 +347,16 @@ exports.getAllBilletteries = (req, res, next) => {
             if (data == undefined || data.length < 1) {
                 funcs.sendSuccess(res, [])
             } else {
-                var eventsToSendToFrond = [];
+                var eventsToSendToFront = [];
                 const getData = async () => {
                     for (var index = 0; index < data.length; index++) {
                         const eventData = data[index];
                         eventData.placesClaimed = await getPlacesClaimedForEvent(req.conBDA, eventData.event_id);
-                        eventsToSendToFrond.push(new Event(eventData));
+                        eventsToSendToFront.push(new Event(eventData));
                     }
                 }
                 await getData();
-                funcs.sendSuccess(res, eventsToSendToFrond);
+                funcs.sendSuccess(res, eventsToSendToFront);
             }
         })
         .catch((error) => funcs.sendError(res, "Erreur, veuillez contacter l'administrateur, (codes erreurs : 205-0 & 405)", error))

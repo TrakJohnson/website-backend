@@ -5,5 +5,6 @@ const router = express.Router();
 const libraryCtrl = require('../controllers/library');
 
 router.get('/getBooks', libraryCtrl.getBooks);
+router.post('/addBookMinimal', libraryCtrl.addBookMinimal);
 
 module.exports = router;
