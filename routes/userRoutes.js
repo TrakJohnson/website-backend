@@ -13,7 +13,7 @@ router.post('/changeInfos', auth.findLoginInToken, userCtrl.modifyAccount)
 router.post('/claimePlace', auth.authToken, userCtrl.claimePlace)
 router.post('/declaimePlace', auth.authToken, userCtrl.declaimePlace)
 router.get('/getPlacesClaimedByUser', auth.authToken, userCtrl.getPlacesClaimedByUser)
-
+router.post('/modifySubscriber', auth.findLoginInToken, userCtrl.modifySubscriber);
 
 
 module.exports = router;

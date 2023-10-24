@@ -1,2 +1,2 @@
-docker run --name SQL_BDA -v %cd%/mysql_volume:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=admin -e MYSQL_DATABASE=53700_bda -e MYSQL_USER=test -e MYSQL_PASSWORD=test -d mysql:latest
+docker run --name SQL_BDA -v %cd%/mysql_volume:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=admin -e MYSQL_DATABASE=53700_bda -e MYSQL_USER=test -e MYSQL_PASSWORD=test -d -p 3306 mysql:latest
 docker exec -i SQL_BDA sh -c "exec mysql -uroot -padmin 53700_bda" < sql-backup_20230623.sql
