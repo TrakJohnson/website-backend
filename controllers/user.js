@@ -305,3 +305,52 @@ exports.VerifyEmail = (req, res, next) => {
     })
     .catch((error) => {return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", error);})        
 }
+
+exports.modifySubscriber = (req, res, next) => {
+    const body = req.body;
+    funcs.bddQuery(req.conBDA, "SELECT * FROM newUsers WHERE login = ? AND admin = 1", [body.login]) // Check if user requesting is admin
+    .then((data) => {
+        if (data[0] == undefined) throw new Error("L'utilisateur qui fait la requête n'est pas administrateur");
+        funcs.bddQuery(req.conBDA, "SELECT email FROM newUsers WHERE login = ?", [body.subscriberLogin])
+        .then((data)=> {
+            let old_email = data[0].email;
+            
+            
+            let reqs = []
+            
+            for (field in body.newInfos){
+                if (body.newInfos[field] == undefined){
+                    continue;
+                }
+                reqs.push(funcs.bddQuery(req.conBDA, "UPDATE newUsers SET "+field+" = ? WHERE login = ?", [body.newInfos[field],body.subscriberLogin]));
+            }
+            Promise.all(reqs).then(()=> {
+                emailOptions = {
+                    from: '"RSI BDA" <bda.rsi.minesparis@gmail.com>', // sender address
+                    to: old_email, // list of receivers
+                    subject: "[BDA] Modification des informations du compte", // Subject line
+                    html : "<p> Bonjour, </p> <p> les informations de ton compte viennent d'être changées sur le portail BDA, si tu n'en es pas à l'origine, contacte un administrateur.</p>"
+                }
+                funcs.sendMail(emailOptions)
+                .then((result) => {
+                    funcs.sendSuccess(res, {message : "Modifications enregistrées"})
+                })
+                .catch((err) => {
+                    return funcs.sendError(res, "Erreur lors de l'envoi d'email d'information, veuillez contacter l'administrateur", err)
+                })
+            })
+            .catch((err) => {
+                
+                return funcs.sendError(res, "Erreur, veuillez contacter l'administrateur", err)
+            });
+        })
+        .catch(error => {
+            return funcs.sendError(res, "Erreur lors du fetching de l'email dans la base de données, merci de contacter un administrateur !");
+    
+        })
+    })
+    .catch(error => {
+        return funcs.sendError(res, "Error lors de la vérification d'admin de l'utilisateur");
+    })
+    
+}

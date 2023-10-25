@@ -14,7 +14,7 @@ function bddQuery(con, query, args) {
         con.query(query, args, function (error, rows) {  // On cherche le mot de passe associé à ce
             // login, ainsi que "admin" qui indique si le compte est admin ou non
             if (error) { // La requête a échoué
-                return reject(error);
+                return reject(query); // error
             }
             if (rows === undefined || rows?.length === 0) { // Si la requête ne renvoie rien
                 return resolve([]);
