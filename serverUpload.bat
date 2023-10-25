@@ -1,6 +1,6 @@
 echo off
 setlocal
-set files="./controllers ./functions ./middlewares ./models ./routes ./index.js package.json package-lock.json router.js"
+set files="./controllers ./functions ./middlewares ./models ./routes ./index.js package.json package-lock.json router.js createNewPromoUsers.js"
 
 echo Sending %files%
 

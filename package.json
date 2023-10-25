@@ -11,6 +11,8 @@
   "dependencies": {
     "angular-calendar": "^0.28.26",
     "body-parser": "^1.19.0",
+    "crypto-js": "^4.1.1",
+    "cryptojs": "^2.5.3",
     "date-fns": "^2.23.0",
     "dotenv": "^16.0.2",
     "express": "^4.17.1",

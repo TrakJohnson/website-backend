@@ -107,14 +107,35 @@ var sendMail = function (mailOptions) {
             pass: process.env["MAIL_PASS"]
         }
     });
-    console.log(transport)
+    //console.log(transport)
+    //console.log(mailOptions)
 
     return transport.sendMail(mailOptions);/*, (error, info) => {
+        console.log("ALED");
         if (error) {
             return console.log(error);
         }
         console.log('Message sent: %s', info.messageId)
         });*/
+}
+
+var getTransporterPool = function(){
+    const transportPool = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        pool: true,
+        auth: {
+            user: process.env["MAIL_SENDER"], 
+            pass: process.env["MAIL_PASS"]
+        }
+    });
+    return transportPool;
+}
+var sendMailPool = function (transporter, mailOptions) {
+    //mailOptions["to"] = process.env["TEST_MAIL_RECEIVER"] //TODO: remove this line, this is to only send mails to myself
+    //console.log(transport)
+    //console.log(mailOptions)
+    return transporter.sendMail(mailOptions);
 }
 
 
@@ -146,6 +167,8 @@ module.exports = {
     closeBilletterie: closeBilletterie,
     oneYAgoDate: oneYAgoDate,
     sendMail: sendMail,
+    sendMailPool: sendMailPool,
+    getTransporterPool: getTransporterPool,
     bddQuery: bddQuery,
     hash: hash,
     sendError: sendError,

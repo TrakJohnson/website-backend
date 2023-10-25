@@ -45,6 +45,7 @@ conPortail = mysql.createConnection({
 });
 conPortail.connect(error => {
     if (error) throw error;
+    console.log("Successfully connected to the Portail's database.");
 });
 
 
@@ -103,3 +104,7 @@ function keepDBConAlive(con)
 
 setInterval(keepDBConAlive(conBDA), 3600*1000);
 setInterval(keepDBConAlive(conPortail), 3600*1000);
+
+//const {createNewPromoUsers} = require("./create:NewPromoUsers")
+//let safetyBoolean = false;
+//createNewPromoUsers("23", conPortail, conBDA, safetyBoolean); //PLEASE DO NOT RUN THIS ACCIDENTALY (let's not recreate a hundred accounts AND SEND ACTUAL EMAILS)
