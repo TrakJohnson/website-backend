@@ -1,0 +1,38 @@
+# /!\ This file must stay in gitignore /!\
+# It is to be **manually transferred** to the EC2 instance
+
+#Used to generate links (in emails for instance)
+#SITE_URL=localhost:4200
+SITE_URL=bda-minesparis.fr
+
+# SQL BDA
+SQL_SCHEMA = "bda"
+#local
+SQL_BDA_HOST=localhost
+SQL_BDA_USER=bdaBD #admin local
+SQL_BDA_PASS=bdaBD
+#SQL_BDA_USER=bdaSite #backend account local
+#SQL_BDA_PASS=azerty
+
+#on aws ec2 instance or something
+SQL_BDA_HOST=db-bda-mines-paris.ct2e4seewkut.eu-west-3.rds.amazonaws.com
+SQL_BDA_USER=admin #admin aws
+SQL_BDA_PASS=~Wvya_5R;jTk4D5
+SQL_BDA_USER=bdaSite
+SQL_BDA_PASS=bugfTxxSwJLKrrzweQnn
+
+# SQL Portail
+SQL_PORTAIL_USER=admin
+SQL_PORTAIL_PASS=tbl8oeLsAG!
+
+TEST_MAIL_RECEIVER=david.abulius@etu.minesparis.psl.eu #only used during testing to test sending of emails
+
+# Email
+
+## https://support.google.com/accounts/answer/185833?hl=en
+MAIL_SENDER=bda.rsi.minesparis@gmail.com
+#MAIL_PASS=rnio wxrm xmme ygvu
+#MAIL_PASS=rniowxrmxmmeygvu
+MAIL_PASS=yhvnklhuncbxpffq
+#MAIL_SENDER=david.abulius@gmail.com
+#MAIL_PASS=onoisbfcnknwfyvz
